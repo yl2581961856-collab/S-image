@@ -51,6 +51,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
 Note:
 - Drag-and-drop upload in frontend still sends `FormData` under the hood (same backend API).
 - Allowed MIME types are controlled by `UPLOAD_ALLOWED_MIME_TYPES`.
+- Upload max size is controlled by `UPLOAD_IMAGE_MAX_BYTES` (default `500 MiB`).
 
 ## Callback signature format
 
@@ -96,3 +97,5 @@ Callback payload note:
 - Example env template: `backend/.env.example`
 - Single-node 4090 tuning guide: `docs/ops/mvp-single-node-4090.md`
 - Alibaba Cloud security checklist: `docs/ops/alicloud-nginx-security-checklist.md`
+- Gateway security runbook: `docs/ops/gateway-security-runbook.md`
+- Deployment templates: `deploy/README.md`

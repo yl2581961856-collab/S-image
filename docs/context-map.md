@@ -12,6 +12,7 @@
 4. `backend/README.md`
 5. `frontend/README.md`
 6. `docs/harness/context-harness-spec.md`
+7. `docs/ops/gateway-security-runbook.md`
 
 ## 2. Single Source of Truth (SoT)
 
@@ -68,6 +69,7 @@
 | `docs/adr/ADR-0001-mvp-workflow-state-machine-language.md` | ADR | proposed/active in MVP |
 | `docs/harness/context-harness-spec.md` | Harness spec | active |
 | `docs/ops/mvp-single-node-4090.md` | Ops profile | active |
+| `docs/ops/gateway-security-runbook.md` | Gateway/security runbook | active |
 | `docs/ops/alicloud-nginx-security-checklist.md` | Security checklist | active |
 | `docs/todo/TODO-phase2-agent-workflow.md` | Deferred backlog | deferred |
 | `backend/openapi/v1.yaml` | API contract | active |
@@ -99,4 +101,4 @@ Recommendation:
 2. Treat `需求文档.txt` + `backend/openapi/v1.yaml` as hard contract constraints.
 3. Treat `docs/todo/TODO-phase2-agent-workflow.md` as out-of-scope guardrail for current MVP.
 4. Do not expand scope to phase-2 features unless explicitly requested.
-
+5. For deployment/security tasks, use files under `deploy/` as implementation baseline.

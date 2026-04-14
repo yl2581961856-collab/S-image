@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     upload_root_dir: str = "storage"
     upload_image_subdir: str = "images"
     generated_image_subdir: str = "generated"
-    upload_image_max_bytes: int = 15 * 1024 * 1024
+    upload_image_max_bytes: int = 500 * 1024 * 1024
     generated_image_max_bytes: int = 20 * 1024 * 1024
     generated_image_fetch_timeout_seconds: int = 20
     upload_allowed_mime_types: str = "image/jpeg,image/png,image/webp"

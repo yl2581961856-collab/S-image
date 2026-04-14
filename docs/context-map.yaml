@@ -34,6 +34,10 @@ entrypoints:
     priority: "p1"
     when: "reproducibility_or_test_harness"
     role: "harness_spec"
+  - path: "docs/ops/gateway-security-runbook.md"
+    priority: "p1"
+    when: "deployment_or_network_security"
+    role: "ops_runbook"
 
 task_routes:
   backend_api_change:
@@ -73,8 +77,14 @@ task_routes:
   deployment_ops:
     read:
       - "docs/ops/mvp-single-node-4090.md"
+      - "docs/ops/gateway-security-runbook.md"
       - "docs/ops/alicloud-nginx-security-checklist.md"
       - "backend/.env.example"
+      - "deploy/README.md"
+      - "deploy/nginx/sqtoimage.conf"
+      - "deploy/docker/docker-compose.redis.yml"
+      - "deploy/systemd/sqtoimage-backend.service"
+      - "deploy/security/ufw-baseline.sh"
 
 source_of_truth:
   product_scope: "需求文档.txt"
@@ -102,7 +112,13 @@ documents:
     - path: "docs/ops/mvp-single-node-4090.md"
       owner: "ops"
       last_reviewed: "2026-04-14"
+    - path: "docs/ops/gateway-security-runbook.md"
+      owner: "ops"
+      last_reviewed: "2026-04-14"
     - path: "docs/ops/alicloud-nginx-security-checklist.md"
+      owner: "ops"
+      last_reviewed: "2026-04-14"
+    - path: "deploy/README.md"
       owner: "ops"
       last_reviewed: "2026-04-14"
     - path: "backend/openapi/v1.yaml"
@@ -139,4 +155,3 @@ rules:
   - "Do not expand scope beyond image generation unless explicitly requested."
   - "Treat backend/openapi/v1.yaml as API contract source."
   - "Treat product scope and boundaries in 需求文档.txt as binding."
-
