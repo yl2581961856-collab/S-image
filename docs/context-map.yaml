@@ -18,6 +18,10 @@ entrypoints:
     priority: "p1"
     when: "state_machine_or_language_decision"
     role: "adr"
+  - path: "docs/adr/ADR-0002-hybrid-inference-stack-2026.md"
+    priority: "p1"
+    when: "inference_strategy_or_model_stack"
+    role: "adr"
   - path: "backend/openapi/v1.yaml"
     priority: "p0"
     when: "api_contract_or_frontend_integration"
@@ -56,6 +60,12 @@ task_routes:
       - "backend/app/services/job_service.py"
       - "docs/adr/ADR-0001-mvp-workflow-state-machine-language.md"
       - "docs/harness/context-harness-spec.md"
+  inference_strategy:
+    read:
+      - "docs/adr/ADR-0002-hybrid-inference-stack-2026.md"
+      - "backend/openapi/v1.yaml"
+      - "backend/app/services/job_service.py"
+      - "docs/ops/gateway-security-runbook.md"
   upload_and_storage:
     read:
       - "backend/app/api/v1/uploads.py"
@@ -104,6 +114,9 @@ documents:
       owner: "engineering"
       last_reviewed: "2026-04-14"
     - path: "docs/adr/ADR-0001-mvp-workflow-state-machine-language.md"
+      owner: "engineering"
+      last_reviewed: "2026-04-14"
+    - path: "docs/adr/ADR-0002-hybrid-inference-stack-2026.md"
       owner: "engineering"
       last_reviewed: "2026-04-14"
     - path: "docs/harness/context-harness-spec.md"

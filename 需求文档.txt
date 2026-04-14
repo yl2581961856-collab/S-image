@@ -74,3 +74,5 @@ Phase 3（前端与闭环 - 第3周）：
 - 上下文地图（机读）：docs/context-map.yaml
 
 - 网关与网络安全运行手册：docs/ops/gateway-security-runbook.md
+
+- 推理栈升级 ADR：docs/adr/ADR-0002-hybrid-inference-stack-2026.md

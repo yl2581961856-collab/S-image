@@ -9,10 +9,11 @@
 1. `需求文档.txt`
 2. `# Project Context & Tech Stack Selection.md`
 3. `docs/adr/ADR-0001-mvp-workflow-state-machine-language.md`
-4. `backend/README.md`
-5. `frontend/README.md`
-6. `docs/harness/context-harness-spec.md`
-7. `docs/ops/gateway-security-runbook.md`
+4. `docs/adr/ADR-0002-hybrid-inference-stack-2026.md`
+5. `backend/README.md`
+6. `frontend/README.md`
+7. `docs/harness/context-harness-spec.md`
+8. `docs/ops/gateway-security-runbook.md`
 
 ## 2. Single Source of Truth (SoT)
 
@@ -67,6 +68,7 @@
 | `需求文档.txt` | Product requirement | active |
 | `# Project Context & Tech Stack Selection.md` | Architecture context | active |
 | `docs/adr/ADR-0001-mvp-workflow-state-machine-language.md` | ADR | proposed/active in MVP |
+| `docs/adr/ADR-0002-hybrid-inference-stack-2026.md` | ADR | proposed |
 | `docs/harness/context-harness-spec.md` | Harness spec | active |
 | `docs/ops/mvp-single-node-4090.md` | Ops profile | active |
 | `docs/ops/gateway-security-runbook.md` | Gateway/security runbook | active |
