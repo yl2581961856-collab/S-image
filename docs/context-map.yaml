@@ -1,0 +1,142 @@
+version: 1
+generated_at: "2026-04-14"
+project:
+  name: "sqtoimage"
+  scope: "image_generation_workflow_only"
+  default_language: "zh-CN"
+
+entrypoints:
+  - path: "需求文档.txt"
+    priority: "p0"
+    when: "always"
+    role: "product_scope"
+  - path: "# Project Context & Tech Stack Selection.md"
+    priority: "p0"
+    when: "always"
+    role: "architecture_context"
+  - path: "docs/adr/ADR-0001-mvp-workflow-state-machine-language.md"
+    priority: "p1"
+    when: "state_machine_or_language_decision"
+    role: "adr"
+  - path: "backend/openapi/v1.yaml"
+    priority: "p0"
+    when: "api_contract_or_frontend_integration"
+    role: "api_contract"
+  - path: "backend/README.md"
+    priority: "p1"
+    when: "backend_runtime_or_routes"
+    role: "backend_runbook"
+  - path: "frontend/README.md"
+    priority: "p1"
+    when: "frontend_flow_or_local_run"
+    role: "frontend_runbook"
+  - path: "docs/harness/context-harness-spec.md"
+    priority: "p1"
+    when: "reproducibility_or_test_harness"
+    role: "harness_spec"
+
+task_routes:
+  backend_api_change:
+    read:
+      - "backend/openapi/v1.yaml"
+      - "backend/app/schemas/jobs.py"
+      - "backend/app/schemas/common.py"
+      - "backend/app/schemas/callbacks.py"
+      - "backend/app/schemas/uploads.py"
+      - "backend/app/api/v1/jobs.py"
+      - "backend/app/api/v1/callbacks.py"
+      - "backend/app/api/v1/uploads.py"
+  state_machine_or_idempotency:
+    read:
+      - "backend/app/services/state_machine.py"
+      - "backend/app/services/job_service.py"
+      - "docs/adr/ADR-0001-mvp-workflow-state-machine-language.md"
+      - "docs/harness/context-harness-spec.md"
+  upload_and_storage:
+    read:
+      - "backend/app/api/v1/uploads.py"
+      - "backend/app/services/upload_service.py"
+      - "backend/app/core/config.py"
+      - "backend/README.md"
+  callback_security:
+    read:
+      - "backend/app/api/v1/callbacks.py"
+      - "backend/app/services/job_service.py"
+      - "backend/app/core/config.py"
+      - "docs/ops/alicloud-nginx-security-checklist.md"
+  frontend_alignment:
+    read:
+      - "frontend/src/types/api.ts"
+      - "frontend/src/lib/apiClient.ts"
+      - "frontend/src/App.tsx"
+      - "backend/openapi/v1.yaml"
+  deployment_ops:
+    read:
+      - "docs/ops/mvp-single-node-4090.md"
+      - "docs/ops/alicloud-nginx-security-checklist.md"
+      - "backend/.env.example"
+
+source_of_truth:
+  product_scope: "需求文档.txt"
+  architecture: "# Project Context & Tech Stack Selection.md"
+  api_contract: "backend/openapi/v1.yaml"
+  backend_runtime: "backend/README.md"
+  frontend_runtime: "frontend/README.md"
+  harness_context: "docs/harness/context-harness-spec.md"
+  deferred_scope: "docs/todo/TODO-phase2-agent-workflow.md"
+
+documents:
+  active:
+    - path: "需求文档.txt"
+      owner: "product+engineering"
+      last_reviewed: "2026-04-14"
+    - path: "# Project Context & Tech Stack Selection.md"
+      owner: "engineering"
+      last_reviewed: "2026-04-14"
+    - path: "docs/adr/ADR-0001-mvp-workflow-state-machine-language.md"
+      owner: "engineering"
+      last_reviewed: "2026-04-14"
+    - path: "docs/harness/context-harness-spec.md"
+      owner: "engineering"
+      last_reviewed: "2026-04-14"
+    - path: "docs/ops/mvp-single-node-4090.md"
+      owner: "ops"
+      last_reviewed: "2026-04-14"
+    - path: "docs/ops/alicloud-nginx-security-checklist.md"
+      owner: "ops"
+      last_reviewed: "2026-04-14"
+    - path: "backend/openapi/v1.yaml"
+      owner: "backend"
+      last_reviewed: "2026-04-14"
+    - path: "backend/README.md"
+      owner: "backend"
+      last_reviewed: "2026-04-14"
+    - path: "frontend/README.md"
+      owner: "frontend"
+      last_reviewed: "2026-04-14"
+  deferred:
+    - path: "docs/todo/TODO-phase2-agent-workflow.md"
+      owner: "product+engineering"
+      last_reviewed: "2026-04-14"
+  planned:
+    - path: "AGENTS.md"
+    - path: "ARCHITECTURE.md"
+    - path: "docs/DESIGN.md"
+    - path: "docs/FRONTEND.md"
+    - path: "docs/PLANS.md"
+    - path: "docs/PRODUCT_SENSE.md"
+    - path: "docs/QUALITY_SCORE.md"
+    - path: "docs/RELIABILITY.md"
+    - path: "docs/SECURITY.md"
+
+ignore_by_default:
+  - path: "docs/todo/TODO-phase2-agent-workflow.md"
+    reason: "Deferred scope for current MVP."
+  - path: "docs/ops/alicloud-nginx-security-checklist.md"
+    reason: "Read only for security/deployment tasks."
+
+rules:
+  - "Do not expand scope beyond image generation unless explicitly requested."
+  - "Treat backend/openapi/v1.yaml as API contract source."
+  - "Treat product scope and boundaries in 需求文档.txt as binding."
+

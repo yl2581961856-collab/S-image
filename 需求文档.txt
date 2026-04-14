@@ -1,0 +1,74 @@
+﻿头部女装电商 AI 生图系统 - 需求与技术架构文档
+
+一、项目背景与核心目标
+本项目旨在构建内部专属 AI 生图中台，以定制化视觉生成管线替代传统外包商拍与假人实拍。
+
+核心目标（防守/降本）：
+实现 AI 模特商拍流程，单张图成本显著下降，同时保持服装细节（版型、褶皱、印花）稳定可控。
+
+二、业务需求说明 (Business Requirements)
+模块 A：AI 模特商拍系统 (Visual Pipeline)
+核心需求：业务人员上传“假人模特穿搭图”或“平铺图”，一键生成“真人模特+真实场景”的商拍图，要求服装细节尽量不失真。
+
+功能清单：
+1. 图片上传与历史记录管理。
+2. 风格/模特参数化选择（如：韩系街头、法式复古、亚洲甜美脸）。
+3. 处理状态查询与进度展示（异步任务）。
+4. 双链路处理：
+   - 人台转真人（局部重绘）
+   - 平铺转真人（虚拟试衣，作为进阶能力）
+5. 失败任务重试与质量审核（人工兜底）。
+
+三、技术栈与架构设计 (Tech Stack & Architecture)
+遵循“轻量化、前后端分离、高性价比算力”原则，系统分为三层：
+
+1. 前端交互层 (Client UI)
+技术栈：TypeScript + React/Next.js + Tailwind CSS（或 Vue3 方案二选一）。
+职责：任务创建、参数配置、状态追踪、结果预览与历史管理。
+
+2. 后端调度网关 (API Gateway & Dispatcher)
+核心语言：Python 3.10+
+Web 框架：FastAPI
+中间件：Redis（异步任务、状态缓存、幂等控制）
+职责：
+- 接收前端任务请求并校验参数
+- 路由调用 ComfyUI API
+- 管理任务状态机、重试、超时与取消
+- 对接对象存储并返回结果地址
+
+3. AI 推理引擎层 (AI Inference Engine)
+视觉引擎：ComfyUI Headless API
+核心模型：Stable Diffusion（majicMIX realistic / SDXL）+ ControlNet（Canny/Depth）+ ADetailer
+职责：执行工作流并回传进度/结果
+
+4. 基础设施与部署 (Infrastructure)
+常规业务节点：云服务器部署 FastAPI、Redis、前端静态资源，建议 Docker Compose 交付。
+GPU 算力节点：Serverless GPU（如 AutoDL/RunPod/云厂商弹性 GPU）。
+扩缩容策略：低峰收缩 GPU 资源，高峰按任务量弹性拉起。
+
+四、MVP 阶段开发里程碑 (Milestones)
+Phase 1（基础跑通 - 第1周）：
+1. 云端单卡 GPU 跑通 ComfyUI 工作流并导出 JSON。
+2. 确定输入参数规范与输出质量验收基线。
+
+Phase 2（网关与任务 - 第2周）：
+1. 开发 FastAPI 网关与任务状态机（创建、查询、取消、回调）。
+2. 编写脚本联调 ComfyUI API，打通异步回调和重试机制。
+
+Phase 3（前端与闭环 - 第3周）：
+1. 搭建前端任务页与结果页。
+2. 完成云服务器 + GPU 节点的联调与上线。
+
+五、当前范围边界
+1. 当前迭代仅包含视觉生成链路。
+2. 非视觉链路相关功能不纳入本期交付。
+
+
+附录：
+- 二期待办文档：docs/todo/TODO-phase2-agent-workflow.md
+
+- 上下文Harness规范：docs/harness/context-harness-spec.md
+
+- 上下文地图（人读）：docs/context-map.md
+
+- 上下文地图（机读）：docs/context-map.yaml
