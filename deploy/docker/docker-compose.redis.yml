@@ -1,7 +1,7 @@
 services:
   redis:
     image: redis:7.2-alpine
-    container_name: sqtoimage-redis
+    container_name: s-image-redis
     restart: unless-stopped
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     ports:

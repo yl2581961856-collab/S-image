@@ -13,7 +13,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $frontendDir = Join-Path $repoRoot "frontend"
 $distDir = Join-Path $frontendDir "dist"
 $artifactDir = Join-Path $repoRoot "release-artifacts"
-$artifactName = "sqtoimage-frontend-$ReleaseTag.zip"
+$artifactName = "s-image-frontend-$ReleaseTag.zip"
 $artifactPath = Join-Path $artifactDir $artifactName
 $shaPath = "$artifactPath.sha256"
 

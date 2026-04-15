@@ -32,16 +32,16 @@ Use template:
 Example:
 
 ```bash
-cd /opt/sqtoimage
+cd /opt/S-image
 mkdir -p deploy/docker/redis
 # copy repo deploy files here first
 docker compose -f deploy/docker/docker-compose.redis.yml up -d
-docker ps | grep sqtoimage-redis
+docker ps | grep s-image-redis
 ```
 
 ## 4. Configure backend runtime
 
-1. Put backend code at `/opt/sqtoimage/backend`.
+1. Put backend code at `/opt/S-image/backend`.
 2. Create venv and install deps.
 3. Prepare `.env` based on `backend/.env.example`.
 4. Ensure key env values:
@@ -69,35 +69,35 @@ UPLOAD_IMAGE_MAX_BYTES=524288000
 ## 5. Register systemd service
 
 Use template:
-- `deploy/systemd/sqtoimage-backend.service`
+- `deploy/systemd/s-image-backend.service`
 
 Commands:
 
 ```bash
-sudo useradd --system --create-home --shell /usr/sbin/nologin sqtoimage || true
-sudo chown -R sqtoimage:sqtoimage /opt/sqtoimage
-sudo cp deploy/systemd/sqtoimage-backend.service /etc/systemd/system/
+sudo useradd --system --create-home --shell /usr/sbin/nologin s-image || true
+sudo chown -R s-image:s-image /opt/S-image
+sudo cp deploy/systemd/s-image-backend.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable sqtoimage-backend
-sudo systemctl restart sqtoimage-backend
-sudo systemctl status sqtoimage-backend --no-pager
+sudo systemctl enable s-image-backend
+sudo systemctl restart s-image-backend
+sudo systemctl status s-image-backend --no-pager
 ```
 
 ## 6. Configure Nginx reverse proxy
 
 Use template:
-- `deploy/nginx/sqtoimage.conf`
+- `deploy/nginx/S-image.conf`
 
 Required edits before enabling:
 1. `server_name your-domain.com`
 2. `ssl_certificate` and `ssl_certificate_key`
-3. `root /var/www/sqtoimage-frontend`
+3. `root /var/www/s-image-frontend`
 
 Enable:
 
 ```bash
-sudo cp deploy/nginx/sqtoimage.conf /etc/nginx/sites-available/sqtoimage.conf
-sudo ln -sf /etc/nginx/sites-available/sqtoimage.conf /etc/nginx/sites-enabled/sqtoimage.conf
+sudo cp deploy/nginx/S-image.conf /etc/nginx/sites-available/S-image.conf
+sudo ln -sf /etc/nginx/sites-available/S-image.conf /etc/nginx/sites-enabled/S-image.conf
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -127,7 +127,7 @@ From gateway server:
 curl -sS http://127.0.0.1:9000/healthz
 curl -Ik https://<your-domain>/healthz
 curl -Ik https://<your-domain>/api/v1/jobs/not-a-uuid
-docker exec -it sqtoimage-redis redis-cli ping
+docker exec -it s-image-redis redis-cli ping
 sudo ss -lntp | egrep ':80|:443|:9000|:6379'
 ```
 

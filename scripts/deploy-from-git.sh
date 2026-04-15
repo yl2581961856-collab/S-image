@@ -5,16 +5,16 @@ set -euo pipefail
 #
 # Example:
 #   bash scripts/deploy-from-git.sh \
-#     --repo-dir /opt/sqtoimage \
+#     --repo-dir /opt/S-image \
 #     --remote origin \
 #     --branch main \
-#     --backend-service sqtoimage-backend \
+#     --backend-service s-image-backend \
 #     --reload-nginx
 
-REPO_DIR="/opt/sqtoimage"
+REPO_DIR="/opt/S-image"
 REMOTE_NAME="origin"
 BRANCH_NAME="main"
-BACKEND_SERVICE="sqtoimage-backend"
+BACKEND_SERVICE="s-image-backend"
 RELOAD_NGINX="false"
 INSTALL_BACKEND_DEPS="false"
 PIP_INDEX_URL=""
@@ -25,10 +25,10 @@ Usage:
   deploy-from-git.sh [options]
 
 Options:
-  --repo-dir <path>          Git repo path on server (default: /opt/sqtoimage)
+  --repo-dir <path>          Git repo path on server (default: /opt/S-image)
   --remote <name>            Git remote name (default: origin)
   --branch <name>            Branch name (default: main)
-  --backend-service <name>   systemd backend service name (default: sqtoimage-backend)
+  --backend-service <name>   systemd backend service name (default: s-image-backend)
   --reload-nginx             Run nginx -t && systemctl reload nginx
   --install-backend-deps     Run pip install -r backend/requirements.txt after pull
   --pip-index-url <url>      Optional pip index URL used with --install-backend-deps

@@ -1,4 +1,4 @@
-# Context Map (sqtoimage)
+# Context Map (S-image)
 
 - Status: Active
 - Last Reviewed: 2026-04-14

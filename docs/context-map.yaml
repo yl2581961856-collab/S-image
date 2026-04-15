@@ -1,7 +1,7 @@
 version: 1
 generated_at: "2026-04-14"
 project:
-  name: "sqtoimage"
+  name: "S-image"
   scope: "image_generation_workflow_only"
   default_language: "zh-CN"
 
@@ -101,9 +101,9 @@ task_routes:
       - "docs/ops/alicloud-nginx-security-checklist.md"
       - "backend/.env.example"
       - "deploy/README.md"
-      - "deploy/nginx/sqtoimage.conf"
+      - "deploy/nginx/S-image.conf"
       - "deploy/docker/docker-compose.redis.yml"
-      - "deploy/systemd/sqtoimage-backend.service"
+      - "deploy/systemd/s-image-backend.service"
       - "deploy/security/ufw-baseline.sh"
       - "scripts/pack-frontend.ps1"
       - "scripts/deploy-frontend.sh"

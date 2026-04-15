@@ -1,0 +1,24 @@
+[Unit]
+Description=S-image backend (FastAPI/Uvicorn)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=s-image
+Group=s-image
+WorkingDirectory=/opt/S-image/backend
+EnvironmentFile=/opt/S-image/backend/.env
+ExecStart=/opt/S-image/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 9000 --workers 2
+Restart=always
+RestartSec=3
+TimeoutStopSec=30
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/S-image/backend/storage
+
+[Install]
+WantedBy=multi-user.target

@@ -4,7 +4,7 @@ This folder contains production-oriented templates for single-node MVP deploymen
 
 ## Files
 
-- `deploy/nginx/sqtoimage.conf`
+- `deploy/nginx/S-image.conf`
   - Nginx reverse proxy for frontend + backend API.
   - Assumes backend listens on `127.0.0.1:9000`.
   - Exposes only `80/443`.
@@ -13,7 +13,7 @@ This folder contains production-oriented templates for single-node MVP deploymen
   - Redis standalone container bound to `127.0.0.1:6379`.
 - `deploy/docker/redis/redis.conf`
   - Redis persistence and safety profile.
-- `deploy/systemd/sqtoimage-backend.service`
+- `deploy/systemd/s-image-backend.service`
   - Systemd unit for FastAPI/Uvicorn process management.
 - `deploy/security/ufw-baseline.sh`
   - Firewall bootstrap script (UFW).

@@ -30,7 +30,7 @@ git push github main
 On server:
 
 ```bash
-ssh-keygen -t ed25519 -C "sqtoimage-deploy" -f ~/.ssh/codeup_deploy_key
+ssh-keygen -t ed25519 -C "s-image-deploy" -f ~/.ssh/codeup_deploy_key
 cat ~/.ssh/codeup_deploy_key.pub
 ```
 
@@ -55,8 +55,8 @@ ssh -T git@codeup.aliyun.com
 ## 4. First clone on server
 
 ```bash
-git clone git@codeup.aliyun.com:<org>/<repo>.git /opt/sqtoimage
-cd /opt/sqtoimage
+git clone git@codeup.aliyun.com:<org>/<repo>.git /opt/S-image
+cd /opt/S-image
 git checkout main
 ```
 
@@ -65,20 +65,20 @@ git checkout main
 Use script:
 
 ```bash
-chmod +x /opt/sqtoimage/scripts/deploy-from-git.sh
-bash /opt/sqtoimage/scripts/deploy-from-git.sh \
-  --repo-dir /opt/sqtoimage \
+chmod +x /opt/S-image/scripts/deploy-from-git.sh
+bash /opt/S-image/scripts/deploy-from-git.sh \
+  --repo-dir /opt/S-image \
   --remote origin \
   --branch main \
-  --backend-service sqtoimage-backend \
+  --backend-service s-image-backend \
   --reload-nginx
 ```
 
 If requirements changed:
 
 ```bash
-bash /opt/sqtoimage/scripts/deploy-from-git.sh \
-  --repo-dir /opt/sqtoimage \
+bash /opt/S-image/scripts/deploy-from-git.sh \
+  --repo-dir /opt/S-image \
   --install-backend-deps \
   --pip-index-url https://pypi.tuna.tsinghua.edu.cn/simple
 ```
@@ -86,7 +86,7 @@ bash /opt/sqtoimage/scripts/deploy-from-git.sh \
 ## 6. Release discipline
 
 1. Production server should not be used as a dev machine.
-2. Keep server repo clean (no local edits in `/opt/sqtoimage`).
+2. Keep server repo clean (no local edits in `/opt/S-image`).
 3. Use `pull --ff-only` style updates only.
 4. Frontend artifact release remains best for low-memory servers.
 

@@ -25,8 +25,8 @@
 
 产物输出到：
 
-- `release-artifacts/sqtoimage-frontend-<timestamp>.zip`
-- `release-artifacts/sqtoimage-frontend-<timestamp>.zip.sha256`
+- `release-artifacts/s-image-frontend-<timestamp>.zip`
+- `release-artifacts/s-image-frontend-<timestamp>.zip.sha256`
 
 服务端发布命令见：
 
