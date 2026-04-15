@@ -42,6 +42,10 @@ entrypoints:
     priority: "p1"
     when: "deployment_or_network_security"
     role: "ops_runbook"
+  - path: "docs/ops/frontend-artifact-release.md"
+    priority: "p1"
+    when: "frontend_release_or_deploy"
+    role: "frontend_release_runbook"
 
 task_routes:
   backend_api_change:
@@ -88,6 +92,7 @@ task_routes:
     read:
       - "docs/ops/mvp-single-node-4090.md"
       - "docs/ops/gateway-security-runbook.md"
+      - "docs/ops/frontend-artifact-release.md"
       - "docs/ops/alicloud-nginx-security-checklist.md"
       - "backend/.env.example"
       - "deploy/README.md"
@@ -95,6 +100,8 @@ task_routes:
       - "deploy/docker/docker-compose.redis.yml"
       - "deploy/systemd/sqtoimage-backend.service"
       - "deploy/security/ufw-baseline.sh"
+      - "scripts/pack-frontend.ps1"
+      - "scripts/deploy-frontend.sh"
 
 source_of_truth:
   product_scope: "需求文档.txt"
@@ -128,6 +135,9 @@ documents:
     - path: "docs/ops/gateway-security-runbook.md"
       owner: "ops"
       last_reviewed: "2026-04-14"
+    - path: "docs/ops/frontend-artifact-release.md"
+      owner: "ops"
+      last_reviewed: "2026-04-15"
     - path: "docs/ops/alicloud-nginx-security-checklist.md"
       owner: "ops"
       last_reviewed: "2026-04-14"

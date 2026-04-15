@@ -28,6 +28,10 @@
 - `release-artifacts/sqtoimage-frontend-<timestamp>.zip`
 - `release-artifacts/sqtoimage-frontend-<timestamp>.zip.sha256`
 
+服务端发布命令见：
+
+- `docs/ops/frontend-artifact-release.md`
+
 ## 关键文档
 
 - 需求：`需求文档.txt`

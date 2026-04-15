@@ -17,6 +17,10 @@ This folder contains production-oriented templates for single-node MVP deploymen
   - Systemd unit for FastAPI/Uvicorn process management.
 - `deploy/security/ufw-baseline.sh`
   - Firewall bootstrap script (UFW).
+- `scripts/pack-frontend.ps1`
+  - Local Windows pack script for frontend artifact.
+- `scripts/deploy-frontend.sh`
+  - Linux server release switch script for frontend artifact deployment.
 
 ## Before using in production
 
