@@ -1,0 +1,17 @@
+# frontend
+frontend/node_modules/
+frontend/dist/
+frontend/tsconfig.tsbuildinfo
+
+# build artifacts
+release-artifacts/
+
+# python
+backend/.venv/
+backend/storage/
+
+# env files
+.env
+backend/.env
+frontend/.env
+

@@ -17,9 +17,19 @@
 2. 启动前端：
    - `cd frontend && npm install && npm run dev`
 
+## 本地打包前端（推荐）
+
+在本地执行一键打包脚本：
+
+- `powershell -ExecutionPolicy Bypass -File scripts/pack-frontend.ps1`
+
+产物输出到：
+
+- `release-artifacts/sqtoimage-frontend-<timestamp>.zip`
+- `release-artifacts/sqtoimage-frontend-<timestamp>.zip.sha256`
+
 ## 关键文档
 
 - 需求：`需求文档.txt`
 - 推理策略 ADR：`docs/adr/ADR-0002-hybrid-inference-stack-2026.md`
 - 网关与网络安全：`docs/ops/gateway-security-runbook.md`
-
