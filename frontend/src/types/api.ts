@@ -1,4 +1,4 @@
-export type AspectRatio = "1:1" | "3:4";
+export type AspectRatio = "1:1" | "4:5" | "3:4" | "2:3" | "9:16" | "4:3" | "16:9";
 export type GarmentCategory = "tops" | "bottoms" | "dress_set";
 
 export type JobStatus =

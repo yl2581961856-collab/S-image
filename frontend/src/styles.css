@@ -1,7 +1,11 @@
 :root {
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   color: #1b2234;
-  background: radial-gradient(circle at 8% 12%, #f9fbff 0%, #eef3ff 48%, #e8edf7 100%);
+  background:
+    radial-gradient(85rem 55rem at -12% -14%, rgba(72, 112, 196, 0.26) 0%, rgba(72, 112, 196, 0) 62%),
+    radial-gradient(64rem 44rem at 112% -8%, rgba(41, 173, 205, 0.2) 0%, rgba(41, 173, 205, 0) 66%),
+    radial-gradient(70rem 52rem at 52% 118%, rgba(111, 132, 214, 0.14) 0%, rgba(111, 132, 214, 0) 68%),
+    linear-gradient(160deg, #f6f9ff 0%, #edf2fb 44%, #e6ebf6 100%);
 }
 
 * {
@@ -11,6 +15,31 @@
 body {
   margin: 0;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.26;
+  background-image:
+    linear-gradient(rgba(29, 62, 132, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 62, 132, 0.08) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(circle at 50% 38%, #000 0%, rgba(0, 0, 0, 0.3) 58%, transparent 100%);
+  z-index: -2;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 40%);
+  z-index: -1;
 }
 
 .app-shell {
@@ -253,25 +282,47 @@ body {
   font-weight: 700;
 }
 
-.ratio-group > div {
-  display: flex;
+.ratio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
 .ratio-group button {
-  padding: 8px 12px;
+  padding: 8px 6px;
   border-radius: 10px;
   border: 1px solid #c9d3e8;
-  background: #ffffff;
+  background: linear-gradient(145deg, #ffffff 0%, #f3f7ff 100%);
   color: #203252;
   cursor: pointer;
   font-weight: 700;
+  min-height: 58px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.ratio-group button strong {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.ratio-group button small {
+  font-size: 10px;
+  color: #5f6f90;
+  font-weight: 600;
+  line-height: 1.1;
 }
 
 .ratio-group button.active {
   border-color: #255cc3;
   background: #255cc3;
   color: #ffffff;
+}
+
+.ratio-group button.active small {
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .action-row {
@@ -382,6 +433,10 @@ body {
 @media (max-width: 620px) {
   .category-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ratio-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .action-row {

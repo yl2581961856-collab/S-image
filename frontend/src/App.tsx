@@ -63,6 +63,19 @@ const FACE_OPTIONS = [
   { id: "neutral_clean", label: "中性高级", preview: "✨" },
 ];
 
+const ASPECT_RATIO_OPTIONS: Array<{
+  value: AspectRatio;
+  label: string;
+}> = [
+  { value: "1:1", label: "方图" },
+  { value: "4:5", label: "电商主图" },
+  { value: "3:4", label: "模特竖版" },
+  { value: "2:3", label: "海报竖版" },
+  { value: "9:16", label: "短视频竖屏" },
+  { value: "4:3", label: "图文横版" },
+  { value: "16:9", label: "宽屏横版" },
+];
+
 function buildWorkflowType(styleId: string, modelFace: string, garmentCategory: GarmentCategory): string {
   return `model_photo_generation_${styleId}_${modelFace}_${garmentCategory}`;
 }
@@ -357,16 +370,17 @@ export default function App(): JSX.Element {
 
             <div className="ratio-group">
               <span>成图比例</span>
-              <div>
-                {(["1:1", "3:4"] as AspectRatio[]).map((ratio) => (
+              <div className="ratio-grid">
+                {ASPECT_RATIO_OPTIONS.map((ratio) => (
                   <button
-                    key={ratio}
+                    key={ratio.value}
                     type="button"
-                    className={params.aspectRatio === ratio ? "active" : ""}
+                    className={params.aspectRatio === ratio.value ? "active" : ""}
                     disabled={processStatus.isGenerating}
-                    onClick={() => setParams((prev) => ({ ...prev, aspectRatio: ratio }))}
+                    onClick={() => setParams((prev) => ({ ...prev, aspectRatio: ratio.value }))}
                   >
-                    {ratio}
+                    <strong>{ratio.value}</strong>
+                    <small>{ratio.label}</small>
                   </button>
                 ))}
               </div>
