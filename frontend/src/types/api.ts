@@ -1,4 +1,5 @@
 export type AspectRatio = "1:1" | "3:4";
+export type GarmentCategory = "tops" | "bottoms" | "dress_set";
 
 export type JobStatus =
   | "queued"
@@ -11,6 +12,7 @@ export type JobStatus =
 
 export interface GenerationParams {
   originalImage: File | null;
+  garmentCategory: GarmentCategory | null;
   styleId: string;
   modelFace: string;
   aspectRatio: AspectRatio;

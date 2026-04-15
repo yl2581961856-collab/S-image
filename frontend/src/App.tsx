@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ImageUploader } from "./components/ImageUploader";
-import { ProgressCard } from "./components/ProgressCard";
 import { ResultViewer } from "./components/ResultViewer";
 import {
   cancelJob,
@@ -11,26 +10,61 @@ import {
   getJobStatus,
   uploadImage,
 } from "./lib/apiClient";
-import type { AspectRatio, GenerationParams, GenerationResult, JobStatus, ProcessStatus } from "./types/api";
+import type {
+  AspectRatio,
+  GarmentCategory,
+  GenerationParams,
+  GenerationResult,
+  JobStatus,
+  ProcessStatus,
+} from "./types/api";
 import "./styles.css";
 
 const TERMINAL_STATUSES = new Set<JobStatus>(["succeeded", "failed", "timeout", "cancelled"]);
 const POLL_INTERVAL_MS = 2000;
 
+const CATEGORY_OPTIONS: Array<{
+  id: GarmentCategory;
+  label: string;
+  icon: string;
+  promptHint: string;
+}> = [
+  {
+    id: "tops",
+    label: "上衣",
+    icon: "👕",
+    promptHint: "upper-body clothing, top wear, keep garment on torso and shoulders",
+  },
+  {
+    id: "bottoms",
+    label: "下装",
+    icon: "👖",
+    promptHint: "lower-body clothing, pants or skirt, keep garment on waist and legs",
+  },
+  {
+    id: "dress_set",
+    label: "连衣裙/套装",
+    icon: "👗",
+    promptHint: "full-body dress or matching set, keep coherent upper-lower garment structure",
+  },
+];
+
 const STYLE_OPTIONS = [
-  { id: "french_street", label: "法式街头" },
-  { id: "korean_minimal", label: "韩系极简" },
-  { id: "city_commute", label: "都市通勤" },
+  { id: "french_street", label: "法式街头", preview: "🧥" },
+  { id: "korean_minimal", label: "韩系高冷", preview: "🖤" },
+  { id: "city_commute", label: "都市通勤", preview: "🏙️" },
+  { id: "editorial_clean", label: "杂志感", preview: "📸" },
 ];
 
 const FACE_OPTIONS = [
-  { id: "asian_sweet", label: "亚洲甜美" },
-  { id: "asian_sharp", label: "亚洲高冷" },
-  { id: "european_modern", label: "欧美现代" },
+  { id: "asian_sweet", label: "亚洲甜美", preview: "😊" },
+  { id: "asian_sharp", label: "亚洲高冷", preview: "😼" },
+  { id: "european_modern", label: "欧美辣妹", preview: "💄" },
+  { id: "neutral_clean", label: "中性高级", preview: "✨" },
 ];
 
-function buildWorkflowType(styleId: string, modelFace: string): string {
-  return `model_photo_generation_${styleId}_${modelFace}`;
+function buildWorkflowType(styleId: string, modelFace: string, garmentCategory: GarmentCategory): string {
+  return `model_photo_generation_${styleId}_${modelFace}_${garmentCategory}`;
 }
 
 function statusToMessage(status: JobStatus, fallback?: string | null): string {
@@ -49,9 +83,26 @@ function statusToMessage(status: JobStatus, fallback?: string | null): string {
   return map[status];
 }
 
+function statusToFriendlyLine(status: JobStatus | null): string {
+  if (!status) {
+    return "";
+  }
+  const map: Record<JobStatus, string> = {
+    queued: "AI 正在排队准备中，马上开始出片",
+    running: "AI 正在布光、换装、构图中",
+    postprocessing: "正在精修细节和材质纹理",
+    succeeded: "成图已完成",
+    failed: "本次生成未成功，请调整后重试",
+    timeout: "本次生成超时，请重试",
+    cancelled: "任务已取消",
+  };
+  return map[status];
+}
+
 export default function App(): JSX.Element {
   const [params, setParams] = useState<GenerationParams>({
     originalImage: null,
+    garmentCategory: null,
     styleId: STYLE_OPTIONS[0].id,
     modelFace: FACE_OPTIONS[0].id,
     aspectRatio: "3:4",
@@ -85,8 +136,8 @@ export default function App(): JSX.Element {
   }, [sourcePreviewUrl]);
 
   const canSubmit = useMemo(() => {
-    return !!params.originalImage && !processStatus.isGenerating;
-  }, [params.originalImage, processStatus.isGenerating]);
+    return !!params.originalImage && !!params.garmentCategory && !processStatus.isGenerating;
+  }, [params.originalImage, params.garmentCategory, processStatus.isGenerating]);
 
   function clearPolling(): void {
     if (pollingRef.current) {
@@ -157,6 +208,10 @@ export default function App(): JSX.Element {
       setResult((prev) => ({ ...prev, error: "请先上传源图。" }));
       return;
     }
+    if (!params.garmentCategory) {
+      setResult((prev) => ({ ...prev, error: "请先选择衣服品类（上衣/下装/连衣裙套装）。" }));
+      return;
+    }
 
     clearPolling();
     setResult({ resultImageUrl: null, error: null });
@@ -164,15 +219,18 @@ export default function App(): JSX.Element {
 
     try {
       const uploaded = await uploadImage(params.originalImage);
+      const categoryConfig = CATEGORY_OPTIONS.find((item) => item.id === params.garmentCategory);
 
       const created = await createJob(
         {
-          workflow_type: buildWorkflowType(params.styleId, params.modelFace),
+          workflow_type: buildWorkflowType(params.styleId, params.modelFace, params.garmentCategory),
           workflow_version: "v1",
           workflow_params: {
             source_image_url: uploaded.image_url,
             style_id: params.styleId,
             model_face: params.modelFace,
+            garment_category: params.garmentCategory,
+            garment_category_prompt: categoryConfig?.promptHint,
             aspect_ratio: params.aspectRatio,
             original_file_name: params.originalImage.name,
           },
@@ -218,8 +276,8 @@ export default function App(): JSX.Element {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <h1>Image Workflow Studio</h1>
-        <p>上传源图，创建生成任务，实时追踪 JobId 状态并展示结果。</p>
+        <h1>上传服装平铺/人台图，一键召唤专属 AI 模特</h1>
+        <p>选好品类、风格和模特气质，自动生成可用于电商展示与种草投放的成图。</p>
       </header>
 
       <main className="workspace">
@@ -234,45 +292,71 @@ export default function App(): JSX.Element {
 
           <section className="panel-block">
             <header className="block-head">
-              <h3>风格参数</h3>
-              <span>会写入 workflow_params</span>
+              <h3>选择衣服品类</h3>
+              <span>必选项</span>
             </header>
-            <label>
-              风格
-              <select
-                value={params.styleId}
-                disabled={processStatus.isGenerating}
-                onChange={(event) =>
-                  setParams((prev) => ({ ...prev, styleId: event.target.value }))
-                }
-              >
-                {STYLE_OPTIONS.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div className="category-grid">
+              {CATEGORY_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`category-btn ${params.garmentCategory === option.id ? "active" : ""}`}
+                  disabled={processStatus.isGenerating}
+                  onClick={() => setParams((prev) => ({ ...prev, garmentCategory: option.id }))}
+                >
+                  <span className="category-icon" aria-hidden>
+                    {option.icon}
+                  </span>
+                  <span>{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </section>
 
-            <label>
-              模特脸型
-              <select
-                value={params.modelFace}
-                disabled={processStatus.isGenerating}
-                onChange={(event) =>
-                  setParams((prev) => ({ ...prev, modelFace: event.target.value }))
-                }
-              >
-                {FACE_OPTIONS.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
+          <section className="panel-block">
+            <header className="block-head">
+              <h3>风格与模特气质</h3>
+              <span>所见即所得</span>
+            </header>
+
+            <div className="selector-group">
+              <p className="selector-title">风格氛围</p>
+              <div className="visual-strip">
+                {STYLE_OPTIONS.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={`visual-totem ${params.styleId === option.id ? "active" : ""}`}
+                    disabled={processStatus.isGenerating}
+                    onClick={() => setParams((prev) => ({ ...prev, styleId: option.id }))}
+                  >
+                    <span className="totem-avatar">{option.preview}</span>
+                    <span className="totem-label">{option.label}</span>
+                  </button>
                 ))}
-              </select>
-            </label>
+              </div>
+            </div>
+
+            <div className="selector-group">
+              <p className="selector-title">模特脸型</p>
+              <div className="visual-strip">
+                {FACE_OPTIONS.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={`visual-totem ${params.modelFace === option.id ? "active" : ""}`}
+                    disabled={processStatus.isGenerating}
+                    onClick={() => setParams((prev) => ({ ...prev, modelFace: option.id }))}
+                  >
+                    <span className="totem-avatar">{option.preview}</span>
+                    <span className="totem-label">{option.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="ratio-group">
-              <span>比例</span>
+              <span>成图比例</span>
               <div>
                 {(["1:1", "3:4"] as AspectRatio[]).map((ratio) => (
                   <button
@@ -291,7 +375,7 @@ export default function App(): JSX.Element {
 
           <div className="action-row">
             <button type="button" disabled={!canSubmit} onClick={() => void handleGenerate()}>
-              {processStatus.isGenerating ? "生成中..." : "一键生成"}
+              {processStatus.isGenerating ? "AI 出片中..." : "一键召唤 AI 模特"}
             </button>
             <button
               type="button"
@@ -299,17 +383,18 @@ export default function App(): JSX.Element {
               disabled={!processStatus.isGenerating}
               onClick={() => void handleCancel()}
             >
-              取消任务
+              取消本次生成
             </button>
           </div>
         </section>
 
         <section className="right-panel">
-          <ProgressCard
-            status={processStatus.status}
-            progress={processStatus.progress}
-            jobId={processStatus.jobId}
-          />
+          {processStatus.isGenerating ? (
+            <div className="generation-banner">
+              <strong>{statusToFriendlyLine(processStatus.status)}</strong>
+              <p>正在专注生成你的商拍图，不需要关注任务编号。</p>
+            </div>
+          ) : null}
 
           {result.error ? <div className="error-box">{result.error}</div> : null}
 

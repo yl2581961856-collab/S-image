@@ -17,7 +17,7 @@ export function ResultViewer({ imageUrl, isGenerating }: ResultViewerProps): JSX
 
   return (
     <div className={`result-viewer ${isGenerating ? "is-busy" : ""}`}>
-      <p>{isGenerating ? "正在生成，请稍候..." : "提交任务后，这里会展示最终商拍图"}</p>
+      <p>{isGenerating ? "AI 正在打磨你的专属商拍图，请稍候..." : "完成参数选择后，成图会展示在这里"}</p>
     </div>
   );
 }
