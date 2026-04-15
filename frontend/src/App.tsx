@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ImageUploader } from "./components/ImageUploader";
 import { ProgressCard } from "./components/ProgressCard";

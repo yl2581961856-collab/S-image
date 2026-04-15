@@ -1,4 +1,4 @@
-﻿interface ResultViewerProps {
+interface ResultViewerProps {
   imageUrl: string | null;
   isGenerating: boolean;
 }

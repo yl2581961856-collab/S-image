@@ -1,4 +1,4 @@
-﻿import type { JobStatus } from "../types/api";
+import type { JobStatus } from "../types/api";
 
 interface ProgressCardProps {
   status: JobStatus | null;

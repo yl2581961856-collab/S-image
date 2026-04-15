@@ -1,4 +1,4 @@
-﻿export type AspectRatio = "1:1" | "3:4";
+export type AspectRatio = "1:1" | "3:4";
 
 export type JobStatus =
   | "queued"
