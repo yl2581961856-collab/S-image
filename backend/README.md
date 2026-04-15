@@ -1,4 +1,4 @@
-﻿# Backend Skeleton
+# Backend Skeleton
 
 ## Run locally
 
@@ -15,6 +15,15 @@ MVP production-like start (single-node profile):
 
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
+```
+
+## Run with Docker (recommended on gateway)
+
+```bash
+cd /data/S-image
+cp -n backend/.env.example backend/.env
+docker compose -f deploy/docker/docker-compose.gateway.yml up -d --build
+curl http://127.0.0.1:9000/healthz
 ```
 
 ## API docs
@@ -49,6 +58,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
 3. After callback completes, query `GET /v1/jobs/{job_id}` and read mirrored `output_urls`.
 
 Note:
+
 - Drag-and-drop upload in frontend still sends `FormData` under the hood (same backend API).
 - Allowed MIME types are controlled by `UPLOAD_ALLOWED_MIME_TYPES`.
 - Upload max size is controlled by `UPLOAD_IMAGE_MAX_BYTES` (default `500 MiB`).
@@ -98,4 +108,5 @@ Callback payload note:
 - Single-node 4090 tuning guide: `docs/ops/mvp-single-node-4090.md`
 - Alibaba Cloud security checklist: `docs/ops/alicloud-nginx-security-checklist.md`
 - Gateway security runbook: `docs/ops/gateway-security-runbook.md`
+- Backend docker runbook: `docs/ops/backend-docker-runbook.md`
 - Deployment templates: `deploy/README.md`

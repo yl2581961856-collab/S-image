@@ -1,0 +1,47 @@
+services:
+  redis:
+    image: redis:7.2-alpine
+    container_name: s-image-redis
+    restart: unless-stopped
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    mem_limit: 512m
+
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    image: s-image-backend:latest
+    container_name: s-image-backend
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - ../../backend/.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      UPLOAD_ROOT_DIR: /app/storage
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - ../../backend/storage:/app/storage
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    mem_limit: 1024m
+
+volumes:
+  redis-data:

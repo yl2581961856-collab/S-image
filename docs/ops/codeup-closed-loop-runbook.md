@@ -64,21 +64,38 @@ git checkout main
 
 Use script:
 
+### 5.1 Docker runtime (recommended)
+
 ```bash
 chmod +x /opt/S-image/scripts/deploy-from-git.sh
 bash /opt/S-image/scripts/deploy-from-git.sh \
   --repo-dir /opt/S-image \
   --remote origin \
   --branch main \
-  --backend-service s-image-backend \
+  --backend-runtime docker \
+  --docker-compose-file deploy/docker/docker-compose.gateway.yml \
+  --docker-services "backend" \
   --reload-nginx
 ```
 
-If requirements changed:
+### 5.2 Systemd runtime (fallback)
 
 ```bash
 bash /opt/S-image/scripts/deploy-from-git.sh \
   --repo-dir /opt/S-image \
+  --remote origin \
+  --branch main \
+  --backend-runtime systemd \
+  --backend-service s-image-backend \
+  --reload-nginx
+```
+
+If requirements changed and you are on systemd runtime:
+
+```bash
+bash /opt/S-image/scripts/deploy-from-git.sh \
+  --repo-dir /opt/S-image \
+  --backend-runtime systemd \
   --install-backend-deps \
   --pip-index-url https://pypi.tuna.tsinghua.edu.cn/simple
 ```
@@ -96,4 +113,3 @@ If Codeup access is temporarily degraded, use artifact path:
 
 1. Local pack: `scripts/pack-frontend.ps1`
 2. Server deploy: `scripts/deploy-frontend.sh`
-

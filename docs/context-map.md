@@ -1,7 +1,7 @@
 # Context Map (S-image)
 
 - Status: Active
-- Last Reviewed: 2026-04-14
+- Last Reviewed: 2026-04-15
 - Purpose: Provide one stable navigation map for humans and agents, based on files that actually exist in this repository.
 
 ## 1. Read Order (Cold Start)
@@ -14,8 +14,9 @@
 6. `frontend/README.md`
 7. `docs/harness/context-harness-spec.md`
 8. `docs/ops/gateway-security-runbook.md`
-9. `docs/ops/frontend-artifact-release.md`
-10. `docs/ops/codeup-closed-loop-runbook.md`
+9. `docs/ops/backend-docker-runbook.md`
+10. `docs/ops/frontend-artifact-release.md`
+11. `docs/ops/codeup-closed-loop-runbook.md`
 
 ## 2. Single Source of Truth (SoT)
 
@@ -61,6 +62,7 @@
 
 ### 3.6 Deployment and operations tuning
 - Runtime profile: `docs/ops/mvp-single-node-4090.md`
+- Docker backend profile: `docs/ops/backend-docker-runbook.md`
 - Security hardening: `docs/ops/alicloud-nginx-security-checklist.md`
 
 ## 4. Active Documents Inventory
@@ -74,6 +76,7 @@
 | `docs/harness/context-harness-spec.md` | Harness spec | active |
 | `docs/ops/mvp-single-node-4090.md` | Ops profile | active |
 | `docs/ops/gateway-security-runbook.md` | Gateway/security runbook | active |
+| `docs/ops/backend-docker-runbook.md` | Backend docker runbook | active |
 | `docs/ops/frontend-artifact-release.md` | Frontend artifact release | active |
 | `docs/ops/codeup-closed-loop-runbook.md` | Codeup closed-loop release | active |
 | `docs/ops/alicloud-nginx-security-checklist.md` | Security checklist | active |
@@ -97,6 +100,7 @@ The following paths are referenced by your target documentation structure but ar
 - `docs/SECURITY.md`
 
 Recommendation:
+
 1. Add them incrementally as thin files.
 2. Link each file back to this context map.
 3. Keep one SoT per domain to avoid conflict between markdown files.
