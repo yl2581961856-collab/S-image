@@ -19,10 +19,28 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
 
 ## Run with Docker (recommended on gateway)
 
+### Local build mode
+
 ```bash
 cd /data/S-image
 cp -n backend/.env.example backend/.env
 docker compose -f deploy/docker/docker-compose.gateway.yml up -d --build
+curl http://127.0.0.1:9000/healthz
+```
+
+### ACR pull mode (recommended on ECS)
+
+```bash
+cd /data/S-image
+cp -n backend/.env.example backend/.env
+cp -n deploy/docker/acr.env.example deploy/docker/acr.env
+# edit deploy/docker/acr.env before run
+
+docker compose \
+  -f deploy/docker/docker-compose.gateway.acr.yml \
+  --env-file deploy/docker/acr.env \
+  up -d
+
 curl http://127.0.0.1:9000/healthz
 ```
 
@@ -109,4 +127,5 @@ Callback payload note:
 - Alibaba Cloud security checklist: `docs/ops/alicloud-nginx-security-checklist.md`
 - Gateway security runbook: `docs/ops/gateway-security-runbook.md`
 - Backend docker runbook: `docs/ops/backend-docker-runbook.md`
+- ACR personal runbook: `docs/ops/acr-personal-runbook.md`
 - Deployment templates: `deploy/README.md`

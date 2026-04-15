@@ -10,8 +10,13 @@ This folder contains production-oriented templates for single-node MVP deploymen
   - Exposes only `80/443`.
   - Upload route `/api/v1/uploads/images` uses dedicated `500m` body limit and `300s` timeout.
 - `deploy/docker/docker-compose.gateway.yml`
-  - Gateway runtime stack: `backend + redis` (Docker Compose).
-  - Binds backend and Redis to loopback only.
+  - Gateway runtime stack: `backend + redis` (Docker Compose, local build mode).
+  - Suitable when server can reliably pull base images from Docker Hub.
+- `deploy/docker/docker-compose.gateway.acr.yml`
+  - Gateway runtime stack: `backend + redis` (ACR image pull mode, no local build).
+  - Designed for ECS environments with Docker Hub instability.
+- `deploy/docker/acr.env.example`
+  - Image mapping template for ACR mode (`IMAGE_BACKEND`, `IMAGE_REDIS`).
 - `deploy/docker/docker-compose.redis.yml`
   - Redis standalone compose (fallback when backend runs outside Docker).
 - `deploy/docker/redis/redis.conf`
@@ -26,7 +31,8 @@ This folder contains production-oriented templates for single-node MVP deploymen
   - Linux server release switch script for frontend artifact deployment.
 - `scripts/deploy-from-git.sh`
   - Linux server git pull deploy script for Codeup-based updates.
-  - Supports both `--backend-runtime systemd` and `--backend-runtime docker`.
+  - Supports `--backend-runtime systemd` and `--backend-runtime docker`.
+  - Docker mode supports `--docker-env-file` and `--docker-no-build`.
 
 ## Before using in production
 

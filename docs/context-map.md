@@ -15,8 +15,9 @@
 7. `docs/harness/context-harness-spec.md`
 8. `docs/ops/gateway-security-runbook.md`
 9. `docs/ops/backend-docker-runbook.md`
-10. `docs/ops/frontend-artifact-release.md`
-11. `docs/ops/codeup-closed-loop-runbook.md`
+10. `docs/ops/acr-personal-runbook.md`
+11. `docs/ops/frontend-artifact-release.md`
+12. `docs/ops/codeup-closed-loop-runbook.md`
 
 ## 2. Single Source of Truth (SoT)
 
@@ -63,6 +64,7 @@
 ### 3.6 Deployment and operations tuning
 - Runtime profile: `docs/ops/mvp-single-node-4090.md`
 - Docker backend profile: `docs/ops/backend-docker-runbook.md`
+- ACR profile: `docs/ops/acr-personal-runbook.md`
 - Security hardening: `docs/ops/alicloud-nginx-security-checklist.md`
 
 ## 4. Active Documents Inventory
@@ -77,6 +79,7 @@
 | `docs/ops/mvp-single-node-4090.md` | Ops profile | active |
 | `docs/ops/gateway-security-runbook.md` | Gateway/security runbook | active |
 | `docs/ops/backend-docker-runbook.md` | Backend docker runbook | active |
+| `docs/ops/acr-personal-runbook.md` | ACR runbook | active |
 | `docs/ops/frontend-artifact-release.md` | Frontend artifact release | active |
 | `docs/ops/codeup-closed-loop-runbook.md` | Codeup closed-loop release | active |
 | `docs/ops/alicloud-nginx-security-checklist.md` | Security checklist | active |

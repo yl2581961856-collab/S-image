@@ -64,7 +64,7 @@ git checkout main
 
 Use script:
 
-### 5.1 Docker runtime (recommended)
+### 5.1 Docker runtime (recommended, local build mode)
 
 ```bash
 chmod +x /opt/S-image/scripts/deploy-from-git.sh
@@ -78,7 +78,25 @@ bash /opt/S-image/scripts/deploy-from-git.sh \
   --reload-nginx
 ```
 
-### 5.2 Systemd runtime (fallback)
+### 5.2 Docker runtime (recommended on ECS, ACR mode)
+
+```bash
+cp -n /opt/S-image/deploy/docker/acr.env.example /opt/S-image/deploy/docker/acr.env
+# edit acr.env before deploy
+
+bash /opt/S-image/scripts/deploy-from-git.sh \
+  --repo-dir /opt/S-image \
+  --remote origin \
+  --branch main \
+  --backend-runtime docker \
+  --docker-compose-file deploy/docker/docker-compose.gateway.acr.yml \
+  --docker-env-file deploy/docker/acr.env \
+  --docker-no-build \
+  --docker-services "backend" \
+  --reload-nginx
+```
+
+### 5.3 Systemd runtime (fallback)
 
 ```bash
 bash /opt/S-image/scripts/deploy-from-git.sh \

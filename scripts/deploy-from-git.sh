@@ -12,13 +12,25 @@ set -euo pipefail
 #     --backend-service s-image-backend \
 #     --reload-nginx
 #
-# Example (docker runtime):
+# Example (docker runtime, local build):
 #   bash scripts/deploy-from-git.sh \
 #     --repo-dir /opt/S-image \
 #     --remote origin \
 #     --branch main \
 #     --backend-runtime docker \
 #     --docker-compose-file deploy/docker/docker-compose.gateway.yml \
+#     --docker-services "backend" \
+#     --reload-nginx
+#
+# Example (docker runtime, ACR image pull):
+#   bash scripts/deploy-from-git.sh \
+#     --repo-dir /opt/S-image \
+#     --remote origin \
+#     --branch main \
+#     --backend-runtime docker \
+#     --docker-compose-file deploy/docker/docker-compose.gateway.acr.yml \
+#     --docker-env-file deploy/docker/acr.env \
+#     --docker-no-build \
 #     --docker-services "backend" \
 #     --reload-nginx
 
@@ -30,6 +42,8 @@ BACKEND_SERVICE="s-image-backend"
 DOCKER_COMPOSE_FILE="deploy/docker/docker-compose.gateway.yml"
 DOCKER_PROJECT_NAME="s-image"
 DOCKER_SERVICES="backend"
+DOCKER_ENV_FILE=""
+DOCKER_BUILD="true"
 RELOAD_NGINX="false"
 INSTALL_BACKEND_DEPS="false"
 PIP_INDEX_URL=""
@@ -40,24 +54,26 @@ Usage:
   deploy-from-git.sh [options]
 
 Options:
-  --repo-dir <path>            Git repo path on server (default: /opt/S-image)
-  --remote <name>              Git remote name (default: origin)
-  --branch <name>              Branch name (default: main)
-  --backend-runtime <mode>     Backend runtime: systemd|docker (default: systemd)
+  --repo-dir <path>              Git repo path on server (default: /opt/S-image)
+  --remote <name>                Git remote name (default: origin)
+  --branch <name>                Branch name (default: main)
+  --backend-runtime <mode>       Backend runtime: systemd|docker (default: systemd)
 
 Systemd options:
-  --backend-service <name>     systemd backend service name (default: s-image-backend)
-  --install-backend-deps       Run pip install -r backend/requirements.txt after pull
-  --pip-index-url <url>        Optional pip index URL used with --install-backend-deps
+  --backend-service <name>       systemd backend service name (default: s-image-backend)
+  --install-backend-deps         Run pip install -r backend/requirements.txt after pull
+  --pip-index-url <url>          Optional pip index URL used with --install-backend-deps
 
 Docker options:
-  --docker-compose-file <path> Docker compose file path (default: deploy/docker/docker-compose.gateway.yml)
-  --docker-project-name <name> Docker compose project name (default: s-image)
-  --docker-services <list>     Space-separated services passed to compose up (default: "backend")
+  --docker-compose-file <path>   Docker compose file path (default: deploy/docker/docker-compose.gateway.yml)
+  --docker-project-name <name>   Docker compose project name (default: s-image)
+  --docker-services <list>       Space-separated services passed to compose up (default: "backend")
+  --docker-env-file <path>       Optional env file used by docker compose (for image vars, etc.)
+  --docker-no-build              Do not pass --build to docker compose up
 
 Common:
-  --reload-nginx               Run nginx -t && systemctl reload nginx
-  -h, --help                   Show help
+  --reload-nginx                 Run nginx -t && systemctl reload nginx
+  -h, --help                     Show help
 EOF
 }
 
@@ -94,6 +110,14 @@ while [[ $# -gt 0 ]]; do
     --docker-services)
       DOCKER_SERVICES="${2:-}"
       shift 2
+      ;;
+    --docker-env-file)
+      DOCKER_ENV_FILE="${2:-}"
+      shift 2
+      ;;
+    --docker-no-build)
+      DOCKER_BUILD="false"
+      shift
       ;;
     --reload-nginx)
       RELOAD_NGINX="true"
@@ -214,19 +238,40 @@ else
     DOCKER_SERVICES_ARR=("backend")
   fi
 
+  DOCKER_COMPOSE_ARGS=(-p "${DOCKER_PROJECT_NAME}" -f "${COMPOSE_FILE_PATH}")
+
+  if [[ -n "${DOCKER_ENV_FILE}" ]]; then
+    if [[ "${DOCKER_ENV_FILE}" = /* ]]; then
+      DOCKER_ENV_FILE_PATH="${DOCKER_ENV_FILE}"
+    else
+      DOCKER_ENV_FILE_PATH="${REPO_DIR}/${DOCKER_ENV_FILE}"
+    fi
+
+    if [[ ! -f "${DOCKER_ENV_FILE_PATH}" ]]; then
+      echo "ERROR: docker env file not found: ${DOCKER_ENV_FILE_PATH}" >&2
+      exit 1
+    fi
+
+    DOCKER_COMPOSE_ARGS+=(--env-file "${DOCKER_ENV_FILE_PATH}")
+  fi
+
   echo "  compose: ${COMPOSE_FILE_PATH}"
   echo "  project: ${DOCKER_PROJECT_NAME}"
   echo "  targets: ${DOCKER_SERVICES}"
+  if [[ -n "${DOCKER_ENV_FILE}" ]]; then
+    echo "  env:     ${DOCKER_ENV_FILE}"
+  fi
+  echo "  build:   ${DOCKER_BUILD}"
 
-  docker compose \
-    -p "${DOCKER_PROJECT_NAME}" \
-    -f "${COMPOSE_FILE_PATH}" \
-    up -d --build "${DOCKER_SERVICES_ARR[@]}"
+  docker compose "${DOCKER_COMPOSE_ARGS[@]}" pull "${DOCKER_SERVICES_ARR[@]}"
 
-  docker compose \
-    -p "${DOCKER_PROJECT_NAME}" \
-    -f "${COMPOSE_FILE_PATH}" \
-    ps
+  if [[ "${DOCKER_BUILD}" == "true" ]]; then
+    docker compose "${DOCKER_COMPOSE_ARGS[@]}" up -d --build "${DOCKER_SERVICES_ARR[@]}"
+  else
+    docker compose "${DOCKER_COMPOSE_ARGS[@]}" up -d "${DOCKER_SERVICES_ARR[@]}"
+  fi
+
+  docker compose "${DOCKER_COMPOSE_ARGS[@]}" ps
 fi
 
 if [[ "${RELOAD_NGINX}" == "true" ]]; then
