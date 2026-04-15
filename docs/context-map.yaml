@@ -46,6 +46,10 @@ entrypoints:
     priority: "p1"
     when: "frontend_release_or_deploy"
     role: "frontend_release_runbook"
+  - path: "docs/ops/codeup-closed-loop-runbook.md"
+    priority: "p1"
+    when: "git_pull_deploy_or_codeup_setup"
+    role: "codeup_closed_loop_runbook"
 
 task_routes:
   backend_api_change:
@@ -93,6 +97,7 @@ task_routes:
       - "docs/ops/mvp-single-node-4090.md"
       - "docs/ops/gateway-security-runbook.md"
       - "docs/ops/frontend-artifact-release.md"
+      - "docs/ops/codeup-closed-loop-runbook.md"
       - "docs/ops/alicloud-nginx-security-checklist.md"
       - "backend/.env.example"
       - "deploy/README.md"
@@ -102,6 +107,7 @@ task_routes:
       - "deploy/security/ufw-baseline.sh"
       - "scripts/pack-frontend.ps1"
       - "scripts/deploy-frontend.sh"
+      - "scripts/deploy-from-git.sh"
 
 source_of_truth:
   product_scope: "需求文档.txt"
@@ -136,6 +142,9 @@ documents:
       owner: "ops"
       last_reviewed: "2026-04-14"
     - path: "docs/ops/frontend-artifact-release.md"
+      owner: "ops"
+      last_reviewed: "2026-04-15"
+    - path: "docs/ops/codeup-closed-loop-runbook.md"
       owner: "ops"
       last_reviewed: "2026-04-15"
     - path: "docs/ops/alicloud-nginx-security-checklist.md"

@@ -21,6 +21,8 @@ This folder contains production-oriented templates for single-node MVP deploymen
   - Local Windows pack script for frontend artifact.
 - `scripts/deploy-frontend.sh`
   - Linux server release switch script for frontend artifact deployment.
+- `scripts/deploy-from-git.sh`
+  - Linux server git pull deploy script for Codeup-based backend updates.
 
 ## Before using in production
 

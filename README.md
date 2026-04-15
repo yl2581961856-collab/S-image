@@ -31,6 +31,7 @@
 服务端发布命令见：
 
 - `docs/ops/frontend-artifact-release.md`
+- `docs/ops/codeup-closed-loop-runbook.md`
 
 ## 关键文档
 

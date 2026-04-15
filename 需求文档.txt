@@ -78,3 +78,5 @@ Phase 3（前端与闭环 - 第3周）：
 - 推理栈升级 ADR：docs/adr/ADR-0002-hybrid-inference-stack-2026.md
 
 - 前端产物发布手册：docs/ops/frontend-artifact-release.md
+
+- Codeup闭环发布手册：docs/ops/codeup-closed-loop-runbook.md

@@ -15,6 +15,7 @@
 7. `docs/harness/context-harness-spec.md`
 8. `docs/ops/gateway-security-runbook.md`
 9. `docs/ops/frontend-artifact-release.md`
+10. `docs/ops/codeup-closed-loop-runbook.md`
 
 ## 2. Single Source of Truth (SoT)
 
@@ -74,6 +75,7 @@
 | `docs/ops/mvp-single-node-4090.md` | Ops profile | active |
 | `docs/ops/gateway-security-runbook.md` | Gateway/security runbook | active |
 | `docs/ops/frontend-artifact-release.md` | Frontend artifact release | active |
+| `docs/ops/codeup-closed-loop-runbook.md` | Codeup closed-loop release | active |
 | `docs/ops/alicloud-nginx-security-checklist.md` | Security checklist | active |
 | `docs/todo/TODO-phase2-agent-workflow.md` | Deferred backlog | deferred |
 | `backend/openapi/v1.yaml` | API contract | active |
