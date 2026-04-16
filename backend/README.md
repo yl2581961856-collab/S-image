@@ -26,6 +26,7 @@ cd /data/S-image
 cp -n backend/.env.example backend/.env
 docker compose -f deploy/docker/docker-compose.gateway.yml up -d --build
 curl http://127.0.0.1:9000/healthz
+curl http://127.0.0.1:9000/readyz
 ```
 
 ### ACR pull mode (recommended on ECS)
@@ -42,6 +43,7 @@ docker compose \
   up -d
 
 curl http://127.0.0.1:9000/healthz
+curl http://127.0.0.1:9000/readyz
 ```
 
 ## API docs
@@ -58,6 +60,7 @@ curl http://127.0.0.1:9000/healthz
 - `POST /v1/jobs/{job_id}/cancel`
 - `POST /v1/callbacks/comfyui`
 - `GET /healthz`
+- `GET /readyz`
 
 ## Runtime behavior
 
