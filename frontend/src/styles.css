@@ -35,14 +35,13 @@ body {
   inset: 0;
   z-index: -3;
   background-image:
-    linear-gradient(90deg, rgba(4, 8, 20, 0.52) 0%, rgba(4, 8, 20, 0.2) 42%, rgba(4, 8, 20, 0.56) 100%),
-    radial-gradient(circle at 72% 30%, rgba(212, 146, 118, 0.22) 0%, rgba(212, 146, 118, 0) 46%),
-    radial-gradient(circle at 18% 65%, rgba(26, 47, 91, 0.3) 0%, rgba(26, 47, 91, 0) 48%),
     var(--hero-image),
-    linear-gradient(140deg, #060a15 0%, #0f1528 45%, #111322 100%);
-  background-size: cover;
-  background-position: center;
-  transform: scale(1.02);
+    linear-gradient(140deg, #050913 0%, #0b1222 44%, #0f172b 100%);
+  background-size: auto 118%, cover;
+  background-position: right center, center;
+  background-repeat: no-repeat;
+  filter: brightness(0.42) contrast(0.95) saturate(0.86);
+  transform: scale(1.03);
 }
 
 .stage-shell::after {
@@ -52,8 +51,10 @@ body {
   z-index: -2;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.62) 27%, rgba(0, 0, 0, 0.26) 48%, rgba(0, 0, 0, 0.06) 68%, rgba(0, 0, 0, 0.3) 100%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.55) 100%);
+    linear-gradient(90deg, rgba(1, 3, 9, 0.92) 0%, rgba(2, 5, 12, 0.84) 28%, rgba(4, 8, 18, 0.56) 48%, rgba(5, 9, 20, 0.28) 64%, rgba(4, 8, 18, 0.62) 100%),
+    linear-gradient(180deg, rgba(2, 4, 10, 0.62) 0%, rgba(2, 4, 10, 0.22) 24%, rgba(2, 4, 10, 0.6) 100%),
+    radial-gradient(circle at 78% 34%, rgba(4, 7, 15, 0.35) 0%, rgba(4, 7, 15, 0.65) 56%, rgba(4, 7, 15, 0.82) 100%),
+    radial-gradient(circle at 12% 68%, rgba(6, 10, 22, 0.28) 0%, rgba(6, 10, 22, 0) 50%);
 }
 
 .top-nav {
@@ -70,8 +71,8 @@ body {
 .nav-right {
   display: flex;
   gap: 22px;
-  font-size: 21px;
-  letter-spacing: 0.04em;
+  font-size: 14px;
+  letter-spacing: 0.06em;
   opacity: 0.84;
   white-space: nowrap;
 }
@@ -82,7 +83,7 @@ body {
 
 .nav-brand {
   font-family: "Bodoni Moda", "Times New Roman", serif;
-  font-size: clamp(54px, 3.2vw, 102px);
+  font-size: clamp(42px, 3vw, 84px);
   letter-spacing: 0.08em;
   font-weight: 500;
   color: #f8e6d8;
@@ -121,9 +122,9 @@ body {
 .input-note {
   margin: 0 0 14px;
   font-size: 12px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(196, 205, 224, 0.62);
+  color: rgba(196, 205, 224, 0.58);
 }
 
 .upload-stack {
@@ -132,24 +133,15 @@ body {
 }
 
 .upload-minimal header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
   margin-bottom: 7px;
 }
 
 .upload-minimal h3 {
   margin: 0;
   font-size: 12px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   font-weight: 600;
   color: rgba(236, 241, 252, 0.88);
-}
-
-.upload-minimal span {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: rgba(194, 205, 230, 0.64);
 }
 
 .upload-zone {
@@ -163,14 +155,6 @@ body {
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.upload-zone p {
-  margin: 0;
-  font-size: 12px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(228, 236, 250, 0.9);
-}
-
 .upload-zone:hover,
 .upload-zone.drag-active {
   border-color: rgba(255, 255, 255, 0.52);
@@ -182,6 +166,28 @@ body {
   cursor: not-allowed;
 }
 
+.upload-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.upload-empty p {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(228, 236, 250, 0.9);
+}
+
+.upload-empty small {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: rgba(189, 201, 228, 0.62);
+}
+
 .upload-thumb {
   width: 100%;
   height: 100%;
@@ -189,22 +195,23 @@ body {
   object-fit: cover;
 }
 
-.upload-minimal footer {
-  margin-top: 6px;
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  color: rgba(189, 201, 228, 0.58);
-}
-
-.segment-control {
+.segment-control,
+.ratio-line {
   margin-top: 18px;
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.16);
   padding-bottom: 8px;
 }
 
-.segment-control button {
+.ratio-line {
+  margin-top: 14px;
+  gap: 18px;
+}
+
+.segment-control button,
+.ratio-line button {
   border: none;
   background: transparent;
   color: rgba(175, 187, 214, 0.62);
@@ -216,7 +223,8 @@ body {
   text-transform: uppercase;
 }
 
-.segment-control button::after {
+.segment-control button::after,
+.ratio-line button::after {
   content: "";
   position: absolute;
   left: 0;
@@ -226,51 +234,15 @@ body {
   background: transparent;
 }
 
-.segment-control button.active {
+.segment-control button.active,
+.ratio-line button.active {
   color: #f4f7ff;
   font-weight: 700;
 }
 
-.segment-control button.active::after {
+.segment-control button.active::after,
+.ratio-line button.active::after {
   background: rgba(255, 240, 224, 0.94);
-}
-
-.ratio-line {
-  margin-top: 14px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.ratio-line button {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 0;
-  background: transparent;
-  color: rgba(214, 224, 245, 0.76);
-  min-width: 82px;
-  min-height: 42px;
-  padding: 6px 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  cursor: pointer;
-}
-
-.ratio-line button span {
-  font-size: 11px;
-  letter-spacing: 0.07em;
-}
-
-.ratio-line button small {
-  font-size: 9px;
-  color: rgba(170, 186, 221, 0.72);
-}
-
-.ratio-line button.active {
-  border-color: rgba(255, 238, 212, 0.84);
-  color: #fff4e8;
 }
 
 .action-line {
@@ -330,6 +302,24 @@ body {
 .visual-stage {
   position: relative;
   min-height: 76vh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.visual-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(4, 7, 16, 0.28) 0%, rgba(4, 7, 16, 0.2) 44%, rgba(4, 7, 16, 0.5) 100%),
+    linear-gradient(180deg, rgba(2, 4, 10, 0.24) 0%, rgba(2, 4, 10, 0.46) 100%);
+}
+
+.visual-stage > * {
+  position: relative;
+  z-index: 1;
 }
 
 .awaiting {
@@ -340,8 +330,10 @@ body {
   text-align: center;
   font-family: "Bodoni Moda", "Times New Roman", serif;
   font-size: clamp(26px, 3vw, 58px);
-  letter-spacing: 0.08em;
-  color: rgba(235, 241, 255, 0.62);
+  letter-spacing: 0.11em;
+  color: rgba(243, 247, 255, 0.88);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.52);
+  transform: translateY(-1.2vh);
 }
 
 .instant-layer,
@@ -581,12 +573,9 @@ body {
     font-size: clamp(48px, 14vw, 84px);
   }
 
-  .segment-control {
+  .segment-control,
+  .ratio-line {
     gap: 14px;
-  }
-
-  .ratio-line button {
-    min-width: 78px;
   }
 
   .action-line {

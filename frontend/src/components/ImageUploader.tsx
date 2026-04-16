@@ -58,8 +58,7 @@ export function ImageUploader({
   return (
     <section className="upload-minimal">
       <header>
-        <h3>{label}</h3>
-        {requiredTag ? <span>{requiredTag}</span> : null}
+        <h3>{requiredTag ? `${label} (${requiredTag})` : label}</h3>
       </header>
 
       <div
@@ -70,11 +69,12 @@ export function ImageUploader({
         {previewUrl ? (
           <img src={previewUrl} alt={`${label} preview`} className="upload-thumb" />
         ) : (
-          <p>{prompt}</p>
+          <div className="upload-empty">
+            <p>{prompt}</p>
+            <small>{file ? file.name : "NO FILE SELECTED"}</small>
+          </div>
         )}
       </div>
-
-      <footer>{file ? file.name : "NO FILE SELECTED"}</footer>
     </section>
   );
 }

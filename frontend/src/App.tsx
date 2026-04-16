@@ -401,17 +401,18 @@ export default function App(): JSX.Element {
             ))}
           </section>
 
-          <section className="ratio-line">
+          <section className="ratio-line" aria-label="aspect ratio">
             {ASPECT_RATIO_OPTIONS.map((ratio) => (
               <button
                 key={ratio.value}
                 type="button"
+                title={ratio.label}
+                aria-label={`${ratio.value} ${ratio.label}`}
                 className={params.aspectRatio === ratio.value ? "active" : ""}
                 disabled={processStatus.isGenerating}
                 onClick={() => setParams((prev) => ({ ...prev, aspectRatio: ratio.value }))}
               >
-                <span>{ratio.value}</span>
-                <small>{ratio.label}</small>
+                {ratio.value}
               </button>
             ))}
           </section>
@@ -432,7 +433,7 @@ export default function App(): JSX.Element {
         </section>
 
         <section className="right-pane">
-          <div className="phase-word">{uiPhase === "instant" ? "INSTANT" : "AFTER"}</div>
+          {uiPhase !== "input" ? <div className="phase-word">{uiPhase === "instant" ? "INSTANT" : "AFTER"}</div> : null}
 
           <div className={`visual-stage ${uiPhase}`}>
             {uiPhase === "input" ? <div className="awaiting">AWAITING GENERATION</div> : null}
@@ -515,5 +516,8 @@ export default function App(): JSX.Element {
     </div>
   );
 }
+
+
+
 
 
