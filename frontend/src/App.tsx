@@ -195,7 +195,7 @@ export default function App(): JSX.Element {
   );
 
   const stageStyle = useMemo(
-    () => ({ "--hero-image": 'url("/images/luxury-bg.jpg")' } as CSSProperties),
+    () => ({ "--hero-image": 'url("/images/luxury-bg.png")' } as CSSProperties),
     [],
   );
 
