@@ -2,10 +2,9 @@ import { useMemo } from "react";
 import { useDropzone } from "react-dropzone";
 
 interface ImageUploaderProps {
-  title: string;
-  hint?: string;
-  placeholder: string;
-  emptyNote?: string;
+  label: string;
+  requiredTag?: string;
+  prompt: string;
   file: File | null;
   previewUrl: string | null;
   disabled?: boolean;
@@ -14,10 +13,9 @@ interface ImageUploaderProps {
 }
 
 export function ImageUploader({
-  title,
-  hint,
-  placeholder,
-  emptyNote,
+  label,
+  requiredTag,
+  prompt,
   file,
   previewUrl,
   disabled = false,
@@ -44,44 +42,39 @@ export function ImageUploader({
     onDropRejected(rejections) {
       const first = rejections[0];
       if (!first) {
-        onValidationError("上传失败，请重试。");
+        onValidationError("Upload failed. Please retry.");
         return;
       }
 
       const reason = first.errors[0]?.code;
       if (reason === "file-invalid-type") {
-        onValidationError("仅支持 JPG / PNG / WEBP 图片。");
+        onValidationError("Only JPG / PNG / WEBP are supported.");
         return;
       }
-      onValidationError("文件不符合上传要求，请检查后重试。");
+      onValidationError("File does not meet upload requirements. Please check and retry.");
     },
   });
 
   return (
-    <section className="upload-card">
-      <header className="upload-head">
-        <h3>{title}</h3>
-        {hint ? <span>{hint}</span> : null}
+    <section className="upload-minimal">
+      <header>
+        <h3>{label}</h3>
+        {requiredTag ? <span>{requiredTag}</span> : null}
       </header>
 
       <div
         {...getRootProps()}
-        className={`upload-dropzone ${isDragActive ? "drag-active" : ""} ${disabled ? "disabled" : ""}`}
+        className={`upload-zone ${isDragActive ? "drag-active" : ""} ${disabled ? "disabled" : ""}`}
       >
         <input {...getInputProps()} />
         {previewUrl ? (
-          <div className="upload-preview">
-            <img src={previewUrl} alt={`${title} preview`} />
-          </div>
+          <img src={previewUrl} alt={`${label} preview`} className="upload-thumb" />
         ) : (
-          <div className="upload-empty">
-            <p>{placeholder}</p>
-            <small>{emptyNote ?? "拖拽或点击上传"}</small>
-          </div>
+          <p>{prompt}</p>
         )}
       </div>
 
-      <footer className="upload-meta">{file ? file.name : "未选择文件"}</footer>
+      <footer>{file ? file.name : "NO FILE SELECTED"}</footer>
     </section>
   );
 }

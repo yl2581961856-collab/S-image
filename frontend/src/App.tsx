@@ -24,57 +24,42 @@ const POLL_INTERVAL_MS = 2000;
 
 type UiPhase = "input" | "instant" | "after";
 
+const DEFAULT_STYLE_ID = "french_street";
+const DEFAULT_MODEL_FACE = "asian_sweet";
+
 const CATEGORY_OPTIONS: Array<{
   id: GarmentCategory;
   label: string;
-  icon: string;
   promptHint: string;
 }> = [
   {
     id: "tops",
-    label: "上衣",
-    icon: "TOP",
+    label: "TOP",
     promptHint: "upper-body clothing, top wear, keep garment on torso and shoulders",
   },
   {
     id: "bottoms",
-    label: "下装",
-    icon: "BTM",
+    label: "BOTTOM",
     promptHint: "lower-body clothing, pants or skirt, keep garment on waist and legs",
   },
   {
     id: "dress_set",
-    label: "连衣裙/套装",
-    icon: "SET",
+    label: "SET",
     promptHint: "full-body dress or matching set, keep coherent upper-lower garment structure",
   },
-];
-
-const STYLE_OPTIONS = [
-  { id: "french_street", label: "法式街头", preview: "FS" },
-  { id: "korean_minimal", label: "韩系极简", preview: "KM" },
-  { id: "city_commute", label: "都市通勤", preview: "CC" },
-  { id: "editorial_clean", label: "杂志感", preview: "ED" },
-];
-
-const FACE_OPTIONS = [
-  { id: "asian_sweet", label: "亚洲甜美", preview: "AS" },
-  { id: "asian_sharp", label: "亚洲高冷", preview: "AH" },
-  { id: "european_modern", label: "欧美辣妹", preview: "EM" },
-  { id: "neutral_clean", label: "中性高级", preview: "NC" },
 ];
 
 const ASPECT_RATIO_OPTIONS: Array<{
   value: AspectRatio;
   label: string;
 }> = [
-  { value: "1:1", label: "方图" },
-  { value: "4:5", label: "电商主图" },
-  { value: "3:4", label: "模特竖版" },
-  { value: "2:3", label: "海报竖版" },
-  { value: "9:16", label: "短视频竖屏" },
-  { value: "4:3", label: "图文横版" },
-  { value: "16:9", label: "宽屏横版" },
+  { value: "1:1", label: "Square" },
+  { value: "4:5", label: "Ecom" },
+  { value: "3:4", label: "Portrait" },
+  { value: "2:3", label: "Poster" },
+  { value: "9:16", label: "Reel" },
+  { value: "4:3", label: "Landscape" },
+  { value: "16:9", label: "Wide" },
 ];
 
 function buildWorkflowType(styleId: string, modelFace: string, garmentCategory: GarmentCategory): string {
@@ -85,33 +70,30 @@ function statusToMessage(status: JobStatus, fallback?: string | null): string {
   if (fallback && fallback.trim().length > 0) {
     return fallback;
   }
-
   const map: Record<JobStatus, string> = {
-    queued: "任务正在排队。",
-    running: "任务正在生成中。",
-    postprocessing: "任务正在做后处理，请稍候。",
-    succeeded: "生成完成。",
-    failed: "生成失败，请调整参数后重试。",
-    timeout: "任务超时，请稍后重试。",
-    cancelled: "任务已取消。",
+    queued: "Job is queued.",
+    running: "Job is generating.",
+    postprocessing: "Job is post-processing.",
+    succeeded: "Generation completed.",
+    failed: "Generation failed. Please adjust params and retry.",
+    timeout: "Generation timed out. Please retry later.",
+    cancelled: "Job was cancelled.",
   };
-
   return map[status];
 }
-
 function statusToInstantLine(status: JobStatus | null): string {
   if (!status) {
-    return "AI 正在读取你的输入。";
+    return "AI is preparing your session";
   }
 
   const map: Record<JobStatus, string> = {
-    queued: "正在搭建场景与光线",
-    running: "正在进行高定级别的换装渲染",
-    postprocessing: "正在打磨材质、皮肤与细节",
-    succeeded: "渲染完成",
-    failed: "本次渲染失败，请重试",
-    timeout: "渲染超时，请重试",
-    cancelled: "任务已取消",
+    queued: "Staging lights and pose space",
+    running: "Tailoring texture, silhouette and drape",
+    postprocessing: "Finishing skin and fabric details",
+    succeeded: "Render finished",
+    failed: "Render failed, please retry",
+    timeout: "Render timeout, please retry",
+    cancelled: "Task cancelled",
   };
 
   return map[status];
@@ -126,8 +108,8 @@ export default function App(): JSX.Element {
     originalImage: null,
     modelImage: null,
     garmentCategory: null,
-    styleId: STYLE_OPTIONS[0].id,
-    modelFace: FACE_OPTIONS[0].id,
+    styleId: DEFAULT_STYLE_ID,
+    modelFace: DEFAULT_MODEL_FACE,
     aspectRatio: "3:4",
   });
 
@@ -148,7 +130,7 @@ export default function App(): JSX.Element {
   });
 
   const [activeResultIndex, setActiveResultIndex] = useState(0);
-  const [comparePosition, setComparePosition] = useState(52);
+  const [comparePosition, setComparePosition] = useState(50);
 
   const pollingRef = useRef<number | null>(null);
 
@@ -241,11 +223,11 @@ export default function App(): JSX.Element {
 
       if (job.status === "succeeded") {
         setActiveResultIndex(0);
-        setComparePosition(52);
+        setComparePosition(50);
         setResult({
           resultImageUrl: primaryImageUrl,
           resultImageUrls: imageUrls,
-          error: primaryImageUrl ? null : "任务完成但未返回成图地址。",
+          error: primaryImageUrl ? null : "Job completed but no output image URL was returned.",
         });
       } else if (terminal) {
         setResult((prev) => ({
@@ -260,7 +242,7 @@ export default function App(): JSX.Element {
       return job.status;
     } catch (error) {
       clearPolling();
-      const message = error instanceof Error ? error.message : "查询任务状态失败";
+      const message = error instanceof Error ? error.message : "Failed to query job status.";
       setProcessStatus((prev) => ({ ...prev, isGenerating: false }));
       setResult((prev) => ({ ...prev, error: message }));
       return null;
@@ -276,23 +258,23 @@ export default function App(): JSX.Element {
 
   async function handleGenerate(): Promise<void> {
     if (!params.originalImage) {
-      setResult((prev) => ({ ...prev, error: "请先上传服装图。" }));
+      setResult((prev) => ({ ...prev, error: "Please upload a garment image first." }));
       return;
     }
 
     if (!params.garmentCategory) {
-      setResult((prev) => ({ ...prev, error: "请选择衣服品类（上衣/下装/连衣裙套装）。" }));
+      setResult((prev) => ({ ...prev, error: "Please select a garment category." }));
       return;
     }
 
     clearPolling();
     setActiveResultIndex(0);
-    setComparePosition(52);
+    setComparePosition(50);
     setResult({ resultImageUrl: null, resultImageUrls: [], error: null });
     setProcessStatus({ isGenerating: true, progress: 3, jobId: null, status: "queued" });
 
     try {
-      const uploaded = await uploadImage(params.originalImage);
+      const uploadedGarment = await uploadImage(params.originalImage);
       let modelReferenceUrl: string | null = null;
 
       if (params.modelImage) {
@@ -303,7 +285,7 @@ export default function App(): JSX.Element {
       const categoryConfig = CATEGORY_OPTIONS.find((item) => item.id === params.garmentCategory);
 
       const workflowParams: Record<string, unknown> = {
-        source_image_url: uploaded.image_url,
+        source_image_url: uploadedGarment.image_url,
         style_id: params.styleId,
         model_face: params.modelFace,
         garment_category: params.garmentCategory,
@@ -327,7 +309,6 @@ export default function App(): JSX.Element {
       );
 
       const isTerminal = TERMINAL_STATUSES.has(created.status);
-
       setProcessStatus({
         isGenerating: !isTerminal,
         progress: created.progress,
@@ -341,7 +322,7 @@ export default function App(): JSX.Element {
       }
     } catch (error) {
       clearPolling();
-      const message = error instanceof Error ? error.message : "任务提交失败";
+      const message = error instanceof Error ? error.message : "Failed to submit generation job.";
       setProcessStatus((prev) => ({ ...prev, isGenerating: false }));
       setResult((prev) => ({ ...prev, error: message }));
     }
@@ -356,54 +337,48 @@ export default function App(): JSX.Element {
       await cancelJob(processStatus.jobId);
       await syncJob(processStatus.jobId);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "取消任务失败";
+      const message = error instanceof Error ? error.message : "Failed to cancel job.";
       setResult((prev) => ({ ...prev, error: message }));
     }
   }
 
   return (
     <div className={`stage-shell phase-${uiPhase}`} style={stageStyle}>
-      <header className="brand-bar">
-        <p className="brand-kicker">THIS JUST IN. AI STUDIO</p>
-        <div className="brand-row">
-          <div className="brand-left">
-            <span>SHOP</span>
-            <span>LOOKBOOK</span>
-            <span>HOW TO STYLE</span>
-          </div>
-          <div className="brand-center">S-IMAGE</div>
-          <div className="brand-right">
-            <span>JOURNAL</span>
-            <span>ABOUT</span>
-            <span>ACCOUNT</span>
-          </div>
+      <header className="top-nav">
+        <div className="nav-left">
+          <span>SHOP</span>
+          <span>LOOKBOOK</span>
+          <span>HOW TO STYLE</span>
+        </div>
+        <div className="nav-brand">S-IMAGE</div>
+        <div className="nav-right">
+          <span>JOURNAL</span>
+          <span>ABOUT</span>
+          <span>ACCOUNT</span>
         </div>
       </header>
 
-      <main className="machine-grid">
-        <section className="input-stage">
-          <p className="phase-chip">INPUT</p>
+      <main className="stage-grid">
+        <section className="left-pane">
+          <p className="input-mark">INPUT</p>
           <h1>YOUR VISION</h1>
-          <p className="stage-copy">上传服装平铺/人台图，定义风格与品类，触发专属 AI 商拍演化。</p>
+          <p className="input-note">Upload, choose category, ignite.</p>
 
-          <div className="upload-dual">
+          <div className="upload-stack">
             <ImageUploader
-              title="服装图"
-              hint="必传"
-              placeholder="上传平铺图或人台图"
-              emptyNote="JPG / PNG / WEBP"
+              label="GARMENT"
+              requiredTag="REQUIRED"
+              prompt="+ UPLOAD GARMENT"
               file={params.originalImage}
               previewUrl={sourcePreviewUrl}
               disabled={processStatus.isGenerating}
               onFileSelected={handleSourceSelected}
               onValidationError={(message) => setResult((prev) => ({ ...prev, error: message }))}
             />
-
             <ImageUploader
-              title="模特参考图"
-              hint="可选"
-              placeholder="上传模特参考图（可留空）"
-              emptyNote="用于视觉参考与对比滑块"
+              label="MODEL REFERENCE"
+              requiredTag="OPTIONAL"
+              prompt="+ UPLOAD MODEL"
               file={params.modelImage}
               previewUrl={modelPreviewUrl}
               disabled={processStatus.isGenerating}
@@ -412,86 +387,36 @@ export default function App(): JSX.Element {
             />
           </div>
 
-          <section className="control-block">
-            <header>
-              <h3>品类</h3>
-              <span>必须选择</span>
-            </header>
-            <div className="category-grid">
-              {CATEGORY_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`category-btn ${params.garmentCategory === option.id ? "active" : ""}`}
-                  disabled={processStatus.isGenerating}
-                  onClick={() => setParams((prev) => ({ ...prev, garmentCategory: option.id }))}
-                >
-                  <strong>{option.icon}</strong>
-                  <span>{option.label}</span>
-                </button>
-              ))}
-            </div>
+          <section className="segment-control" aria-label="garment category">
+            {CATEGORY_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className={params.garmentCategory === option.id ? "active" : ""}
+                disabled={processStatus.isGenerating}
+                onClick={() => setParams((prev) => ({ ...prev, garmentCategory: option.id }))}
+              >
+                {option.label}
+              </button>
+            ))}
           </section>
 
-          <section className="control-block">
-            <header>
-              <h3>风格图腾</h3>
-              <span>点击即选中</span>
-            </header>
-
-            <div className="totem-row">
-              {STYLE_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`totem-btn ${params.styleId === option.id ? "active" : ""}`}
-                  disabled={processStatus.isGenerating}
-                  onClick={() => setParams((prev) => ({ ...prev, styleId: option.id }))}
-                >
-                  <span>{option.preview}</span>
-                  <small>{option.label}</small>
-                </button>
-              ))}
-            </div>
-
-            <div className="totem-row">
-              {FACE_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`totem-btn ${params.modelFace === option.id ? "active" : ""}`}
-                  disabled={processStatus.isGenerating}
-                  onClick={() => setParams((prev) => ({ ...prev, modelFace: option.id }))}
-                >
-                  <span>{option.preview}</span>
-                  <small>{option.label}</small>
-                </button>
-              ))}
-            </div>
+          <section className="ratio-line">
+            {ASPECT_RATIO_OPTIONS.map((ratio) => (
+              <button
+                key={ratio.value}
+                type="button"
+                className={params.aspectRatio === ratio.value ? "active" : ""}
+                disabled={processStatus.isGenerating}
+                onClick={() => setParams((prev) => ({ ...prev, aspectRatio: ratio.value }))}
+              >
+                <span>{ratio.value}</span>
+                <small>{ratio.label}</small>
+              </button>
+            ))}
           </section>
 
-          <section className="control-block ratio-block">
-            <header>
-              <h3>比例</h3>
-              <span>全场景覆盖</span>
-            </header>
-            <div className="ratio-grid">
-              {ASPECT_RATIO_OPTIONS.map((ratio) => (
-                <button
-                  key={ratio.value}
-                  type="button"
-                  className={params.aspectRatio === ratio.value ? "active" : ""}
-                  disabled={processStatus.isGenerating}
-                  onClick={() => setParams((prev) => ({ ...prev, aspectRatio: ratio.value }))}
-                >
-                  <strong>{ratio.value}</strong>
-                  <small>{ratio.label}</small>
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <div className="action-row">
+          <div className="action-line">
             <button type="button" className="ignite" disabled={!canSubmit} onClick={() => void handleGenerate()}>
               {processStatus.isGenerating ? "CRAFTING..." : "IGNITE"}
             </button>
@@ -506,22 +431,17 @@ export default function App(): JSX.Element {
           </div>
         </section>
 
-        <section className="after-stage">
-          <div className="state-title">{uiPhase === "instant" ? "INSTANT" : "AFTER"}</div>
+        <section className="right-pane">
+          <div className="phase-word">{uiPhase === "instant" ? "INSTANT" : "AFTER"}</div>
 
-          <div className={`visual-canvas ${uiPhase}`}>
-            {uiPhase === "input" ? (
-              <div className="input-placeholder">
-                <div className="ghost-silhouette" />
-                <p>等待你的输入，右侧将展示成片冲击力。</p>
-              </div>
-            ) : null}
+          <div className={`visual-stage ${uiPhase}`}>
+            {uiPhase === "input" ? <div className="awaiting">AWAITING GENERATION</div> : null}
 
             {uiPhase === "instant" ? (
               <div className="instant-layer">
                 {activeResultUrl ? <img src={activeResultUrl} alt="last result" className="blur-preview" /> : null}
-                <div className="instant-overlay">
-                  <h2>INSTANT FITTING</h2>
+                <div className="instant-copy">
+                  <h2>INSTANT UPGRADE</h2>
                   <p>{statusToInstantLine(processStatus.status)}</p>
                   <div className="shimmer-track">
                     <span style={{ width: `${Math.max(8, processStatus.progress)}%` }} />
@@ -532,7 +452,7 @@ export default function App(): JSX.Element {
 
             {uiPhase === "after" && activeResultUrl ? (
               <div className="after-layer">
-                <div className="compare-frame">
+                <div className="compare-wrap">
                   <img src={activeResultUrl} alt="Generated result" className="after-image" />
 
                   {beforeCompareUrl ? (
@@ -545,12 +465,12 @@ export default function App(): JSX.Element {
                   ) : null}
 
                   {beforeCompareUrl ? (
-                    <div className="compare-handle" style={{ left: `${comparePosition}%` }}>
+                    <div className="compare-line" style={{ left: `${comparePosition}%` }}>
                       <span />
                     </div>
                   ) : null}
 
-                  <div className="after-badge">AFTER</div>
+                  <div className="after-label">AFTER</div>
                 </div>
 
                 {beforeCompareUrl ? (
@@ -565,8 +485,8 @@ export default function App(): JSX.Element {
                   />
                 ) : null}
 
-                <a href={activeResultUrl} target="_blank" rel="noreferrer" className="open-link">
-                  查看高清原图
+                <a href={activeResultUrl} target="_blank" rel="noreferrer" className="open-image-link">
+                  OPEN ORIGINAL
                 </a>
               </div>
             ) : null}
@@ -578,7 +498,7 @@ export default function App(): JSX.Element {
                 <button
                   key={url}
                   type="button"
-                  className={`pose-dot ${index === activeResultIndex ? "active" : ""}`}
+                  className={`pose-thumb ${index === activeResultIndex ? "active" : ""}`}
                   onMouseEnter={() => setActiveResultIndex(index)}
                   onFocus={() => setActiveResultIndex(index)}
                   onClick={() => setActiveResultIndex(index)}
@@ -595,3 +515,5 @@ export default function App(): JSX.Element {
     </div>
   );
 }
+
+
