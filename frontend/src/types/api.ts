@@ -12,6 +12,7 @@ export type JobStatus =
 
 export interface GenerationParams {
   originalImage: File | null;
+  modelImage: File | null;
   garmentCategory: GarmentCategory | null;
   styleId: string;
   modelFace: string;
@@ -27,6 +28,7 @@ export interface ProcessStatus {
 
 export interface GenerationResult {
   resultImageUrl: string | null;
+  resultImageUrls: string[];
   error: string | null;
 }
 

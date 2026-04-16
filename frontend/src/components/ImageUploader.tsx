@@ -2,6 +2,10 @@ import { useMemo } from "react";
 import { useDropzone } from "react-dropzone";
 
 interface ImageUploaderProps {
+  title: string;
+  hint?: string;
+  placeholder: string;
+  emptyNote?: string;
   file: File | null;
   previewUrl: string | null;
   disabled?: boolean;
@@ -10,6 +14,10 @@ interface ImageUploaderProps {
 }
 
 export function ImageUploader({
+  title,
+  hint,
+  placeholder,
+  emptyNote,
   file,
   previewUrl,
   disabled = false,
@@ -36,7 +44,7 @@ export function ImageUploader({
     onDropRejected(rejections) {
       const first = rejections[0];
       if (!first) {
-        onValidationError("文件上传失败，请重试。");
+        onValidationError("上传失败，请重试。");
         return;
       }
 
@@ -50,30 +58,30 @@ export function ImageUploader({
   });
 
   return (
-    <section className="panel-block">
-      <header className="block-head">
-        <h3>上传源图</h3>
-        <span>支持拖拽与点击上传</span>
+    <section className="upload-card">
+      <header className="upload-head">
+        <h3>{title}</h3>
+        {hint ? <span>{hint}</span> : null}
       </header>
+
       <div
         {...getRootProps()}
-        className={`uploader ${isDragActive ? "drag-active" : ""} ${disabled ? "disabled" : ""}`}
+        className={`upload-dropzone ${isDragActive ? "drag-active" : ""} ${disabled ? "disabled" : ""}`}
       >
         <input {...getInputProps()} />
         {previewUrl ? (
-          <div className="uploader-preview">
-            <img src={previewUrl} alt="Source preview" />
+          <div className="upload-preview">
+            <img src={previewUrl} alt={`${title} preview`} />
           </div>
         ) : (
-          <div className="uploader-empty">
-            <p>将图片拖拽到此处，或点击选择文件</p>
-            <small>JPG / PNG / WEBP</small>
+          <div className="upload-empty">
+            <p>{placeholder}</p>
+            <small>{emptyNote ?? "拖拽或点击上传"}</small>
           </div>
         )}
       </div>
-      <footer className="uploader-footer">
-        {file ? <span>{file.name}</span> : <span>尚未选择文件</span>}
-      </footer>
+
+      <footer className="upload-meta">{file ? file.name : "未选择文件"}</footer>
     </section>
   );
 }

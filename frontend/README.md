@@ -1,4 +1,4 @@
-﻿# Frontend (React + TypeScript)
+# Frontend (React + TypeScript)
 
 ## Stack
 
@@ -31,12 +31,12 @@ cp .env.example .env
 
 ## Implemented flow
 
-1. Drag/drop or click upload source image.
-2. Frontend calls `POST /v1/uploads/images` with `FormData`.
-3. Frontend submits `POST /v1/jobs` using returned `image_url` in `workflow_params`.
+1. Input phase (`INPUT`): upload garment image (required), model reference image (optional), choose category/style/face/aspect ratio.
+2. Frontend calls `POST /v1/uploads/images` using `FormData`.
+3. Frontend submits `POST /v1/jobs` with uploaded `image_url` in `workflow_params`.
 4. Frontend polls `GET /v1/jobs/{job_id}` every 2s.
-5. Progress bar updates from backend `progress` (`0-100`).
-6. On success, show first item in `output_urls`.
+5. Instant phase (`INSTANT`): shimmer sweep + blur-to-focus progress presentation.
+6. After phase (`AFTER`): result image, optional before/after slider, and multi-pose hover switching.
 7. Supports `POST /v1/jobs/{job_id}/cancel`.
 
 ## API contract alignment
