@@ -1,25 +1,5 @@
 #!/usr/bin/env python3
-"""
-Evaluation scaffold for image generation quality.
-
-Usage examples:
-  python scripts/evaluate.py \
-    --reference-dir /data/eval/ref \
-    --generated-dir /data/eval/gen \
-    --metrics ssim lpips fid kid \
-    --output /data/eval/report.json
-
-  # Only validate file pairing and dataset layout
-  python scripts/evaluate.py --reference-dir ./ref --generated-dir ./gen --dry-run
-
-Notes:
-- This file is intentionally a scaffold.
-- Fill in metric implementations in:
-  - metric_ssim
-  - metric_lpips
-  - metric_fid
-  - metric_kid
-"""
+"""Evaluation CLI for generated image quality."""
 
 from __future__ import annotations
 
@@ -30,9 +10,14 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+from algorithm.metrics import compute_fid, compute_kid, compute_lpips, compute_ssim
+
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 PAIRWISE_METRICS = {"ssim", "lpips"}
-DISTRIBUTION_METRICS = {"fid", "kid"}
 ALL_METRICS = ["ssim", "lpips", "fid", "kid"]
 
 
@@ -124,55 +109,6 @@ def build_pairs(ref_paths: list[Path], gen_paths: list[Path], strict: bool) -> l
     return [ImagePair(reference=ref_index[name], generated=gen_index[name]) for name in matched]
 
 
-def metric_ssim(pairs: list[ImagePair], image_size: int | None, batch_size: int, device: str) -> float:
-    """
-    TODO:
-    - Implement SSIM (higher is better).
-    - Typical: mean SSIM over paired images.
-    - Input: pairs (reference/generated), optional resize/image preprocessing.
-    """
-    raise NotImplementedError("Implement metric_ssim().")
-
-
-def metric_lpips(pairs: list[ImagePair], image_size: int | None, batch_size: int, device: str) -> float:
-    """
-    TODO:
-    - Implement LPIPS (lower is better).
-    - Typical: mean LPIPS over paired images.
-    """
-    raise NotImplementedError("Implement metric_lpips().")
-
-
-def metric_fid(
-    reference_paths: list[Path],
-    generated_paths: list[Path],
-    image_size: int | None,
-    batch_size: int,
-    device: str,
-) -> float:
-    """
-    TODO:
-    - Implement FID (lower is better).
-    - Dataset-level metric, not pairwise.
-    """
-    raise NotImplementedError("Implement metric_fid().")
-
-
-def metric_kid(
-    reference_paths: list[Path],
-    generated_paths: list[Path],
-    image_size: int | None,
-    batch_size: int,
-    device: str,
-) -> float:
-    """
-    TODO:
-    - Implement KID (lower is better).
-    - Dataset-level metric, not pairwise.
-    """
-    raise NotImplementedError("Implement metric_kid().")
-
-
 def main() -> int:
     args = parse_args()
 
@@ -210,39 +146,44 @@ def main() -> int:
         print("No paired files found for pairwise metrics.", file=sys.stderr)
         return 2
 
+    pair_tuples = [(p.reference, p.generated) for p in pairs]
     metric_values: dict[str, float | None] = {m: None for m in args.metrics}
 
-    for metric in args.metrics:
-        if metric == "ssim":
-            metric_values[metric] = metric_ssim(
-                pairs=pairs,
-                image_size=args.image_size,
-                batch_size=args.batch_size,
-                device=args.device,
-            )
-        elif metric == "lpips":
-            metric_values[metric] = metric_lpips(
-                pairs=pairs,
-                image_size=args.image_size,
-                batch_size=args.batch_size,
-                device=args.device,
-            )
-        elif metric == "fid":
-            metric_values[metric] = metric_fid(
-                reference_paths=ref_paths,
-                generated_paths=gen_paths,
-                image_size=args.image_size,
-                batch_size=args.batch_size,
-                device=args.device,
-            )
-        elif metric == "kid":
-            metric_values[metric] = metric_kid(
-                reference_paths=ref_paths,
-                generated_paths=gen_paths,
-                image_size=args.image_size,
-                batch_size=args.batch_size,
-                device=args.device,
-            )
+    try:
+        for metric in args.metrics:
+            if metric == "ssim":
+                metric_values[metric] = compute_ssim(
+                    pairs=pair_tuples,
+                    image_size=args.image_size,
+                    batch_size=args.batch_size,
+                    device=args.device,
+                )
+            elif metric == "lpips":
+                metric_values[metric] = compute_lpips(
+                    pairs=pair_tuples,
+                    image_size=args.image_size,
+                    batch_size=args.batch_size,
+                    device=args.device,
+                )
+            elif metric == "fid":
+                metric_values[metric] = compute_fid(
+                    reference_paths=ref_paths,
+                    generated_paths=gen_paths,
+                    image_size=args.image_size,
+                    batch_size=args.batch_size,
+                    device=args.device,
+                )
+            elif metric == "kid":
+                metric_values[metric] = compute_kid(
+                    reference_paths=ref_paths,
+                    generated_paths=gen_paths,
+                    image_size=args.image_size,
+                    batch_size=args.batch_size,
+                    device=args.device,
+                )
+    except Exception as exc:
+        print(f"Metric computation failed: {exc}", file=sys.stderr)
+        return 3
 
     report = EvalReport(
         config=config,
