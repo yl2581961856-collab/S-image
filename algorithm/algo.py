@@ -3,7 +3,18 @@ from __future__ import annotations
 from typing import Any
 
 import torch
-import torch.nn.functional as F
+
+from .ops import (
+    build_mask_condition,
+    build_person_input,
+    concat_width,
+    decode_from_latent,
+    denoise,
+    encode_to_latent,
+    init_noise_like,
+    prepare_inputs,
+    split_width,
+)
 
 
 @torch.inference_mode()
@@ -15,7 +26,8 @@ def catvton_forward(
     scheduler: Any,
     M: torch.Tensor | None = None,
     mask_free: bool = True,
-) -> torch.Tensor:
+    return_trace: bool = False,
+) -> torch.Tensor | tuple[torch.Tensor, dict[str, Any]]:
     """Run one CATVTON denoising pass.
 
     Args:
@@ -26,54 +38,47 @@ def catvton_forward(
         scheduler: Diffusion scheduler with timesteps and step().
         M: Optional binary mask tensor [B, 1, H, W].
         mask_free: If True, do not use mask branch.
+        return_trace: If True, return key intermediate metadata for debugging.
 
     Returns:
-        Output image tensor, shape [B, 3, H, W].
+        Output image tensor [B, 3, H, W], or (output, trace) when return_trace=True.
 
     Notes:
         - This follows the paper's high-level formulation.
         - Concrete UNet/Scheduler call signatures can differ by implementation.
     """
-    if Ip.ndim != 4 or Ig.ndim != 4:
-        raise ValueError("Ip and Ig must be 4D tensors [B, C, H, W].")
-    if Ip.shape != Ig.shape:
-        raise ValueError(f"Ip/Ig shape mismatch: {Ip.shape} vs {Ig.shape}")
-    if not mask_free:
-        if M is None:
-            raise ValueError("M is required when mask_free=False")
-        if M.ndim != 4 or M.shape[0] != Ip.shape[0] or M.shape[-2:] != Ip.shape[-2:]:
-            raise ValueError("M must be [B, 1, H, W] with same B/H/W as Ip")
+    Ip, Ig, M = prepare_inputs(Ip=Ip, Ig=Ig, M=M, mask_free=mask_free)
+    trace: dict[str, Any] | None = None
+    if return_trace:
+        trace = {
+            "mask_free": mask_free,
+            "input_shape": list(Ip.shape),
+            "mask_shape": list(M.shape) if M is not None else None,
+        }
 
     # (1) build person input Ii
-    Ii = Ip if mask_free else Ip * M
-
-    # (2) concat along spatial width and encode to latent
-    # x_in: [B, 3, H, 2W]
-    x_in = torch.cat([Ii, Ig], dim=-1)
-    Xi = vae.encode(x_in).latent_dist.sample() * vae.config.scaling_factor
-
-    # (3) optional mask latent condition
-    Mi = None
-    if not mask_free:
-        # M_cat: [B, 1, H, 2W]
-        M_cat = torch.cat([M, torch.zeros_like(M)], dim=-1)
-        Mi = F.interpolate(M_cat, size=Xi.shape[-2:], mode="nearest")
-
+    Ii = build_person_input(Ip=Ip, M=M, mask_free=mask_free)
+    # (2) concat along width and encode latent Xi
+    x_in = concat_width(Ii, Ig)
+    Xi = encode_to_latent(vae, x_in)
+    # (3) optional mask condition Mi
+    Mi = build_mask_condition(M, Xi.shape[-2:]) if not mask_free else None
     # initial noise z_T
-    z = torch.randn_like(Xi)
+    z_init = init_noise_like(Xi)
 
-    # (4) denoising loop
-    for t in scheduler.timesteps:
-        if mask_free:
-            cond = torch.cat([z, Xi], dim=1)
-        else:
-            cond = torch.cat([z, Mi, Xi], dim=1)
+    if trace is not None:
+        trace["concat_input_shape"] = list(x_in.shape)
+        trace["latent_condition_shape"] = list(Xi.shape)
+        trace["latent_mask_shape"] = list(Mi.shape) if Mi is not None else None
 
-        # Some UNet impls use named args, adjust here if needed.
-        eps = unet(cond, t).sample
-        z = scheduler.step(eps, t, z).prev_sample
+    # (4) denoise loop
+    z = denoise(unet=unet, scheduler=scheduler, z_init=z_init, Xi=Xi, Mi=Mi, trace=trace)
+    # (5) split width and decode person branch
+    z_person, _ = split_width(z)
+    out = decode_from_latent(vae, z_person)
 
-    # (5) split back along width, decode person branch
-    z_person, _ = torch.chunk(z, 2, dim=-1)
-    out = vae.decode(z_person / vae.config.scaling_factor).sample
+    if trace is not None:
+        trace["output_shape"] = list(out.shape)
+        return out, trace
+
     return out

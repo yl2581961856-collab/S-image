@@ -1,3 +1,5 @@
 """Algorithm package for model forward and evaluation metrics."""
 
-__all__ = ["algo", "metrics"]
+from .algo import catvton_forward
+
+__all__ = ["catvton_forward", "algo", "metrics", "ops"]

@@ -3,10 +3,16 @@
 This folder contains two parts:
 
 1. `algo.py`
-- CATVTON forward-pass scaffold (`catvton_forward`).
-- Shape checks and mask-free/mask-based condition flow are included.
+- CATVTON forward-pass orchestrator (`catvton_forward`).
+- Core flow only: validate -> build condition -> denoise -> decode.
 
-2. `metrics.py`
+2. `ops/`
+- Minimal operator library used by `algo.py`.
+- `ops/io.py`: input validation/alignment.
+- `ops/latent.py`: width concat/split, VAE encode/decode, mask condition.
+- `ops/sampling.py`: noise init + denoising loop.
+
+3. `metrics.py`
 - Metric helpers used by `scripts/evaluate.py`.
 - Implemented metric entrypoints:
   - `compute_ssim` (pairwise, higher is better)
@@ -16,8 +22,11 @@ This folder contains two parts:
 
 ## Dependency strategy
 
-To stay close to a tinygrad-like engineering style, metrics are implemented in native PyTorch math,
-without external metric packages such as `scikit-image`, `lpips`, or `torchmetrics`.
+To stay close to a tinygrad-like engineering style:
+- `algo.py` is orchestration-only.
+- operator details are split into small pure-PyTorch files under `ops/`.
+- metrics are implemented in native PyTorch math without metric packages like
+  `scikit-image`, `lpips`, or `torchmetrics`.
 
 Required:
 
