@@ -1,40 +1,20 @@
 # S-image
 
-电商 AI 生图网关项目（MVP）：聚焦“模特图/种草图”生成流程，提供上传、任务创建、状态追踪、回调处理与结果分发能力。
+Working on a computation-graph style image generation engine.
 
-## 项目结构
+This repository is currently moving away from a conventional app-first image workflow and toward a small UOp/IR layer for experimenting with Flux-style model execution, graph rewrites, and backend lowering.
 
-- `backend/`：FastAPI 网关与任务状态机（Redis）
-- `frontend/`：React + TypeScript 前端页面
-- `docs/`：需求、ADR、运维与安全文档
-- `deploy/`：Nginx / systemd / Redis / 防火墙部署模板
+## Current Focus
 
-## 快速开始
+- Build a tinygrad-inspired UOp graph representation.
+- Describe Flux/DiT blocks as backend-neutral graph nodes.
+- Keep Triton and Tile-Lang as possible lowering targets for core kernels.
+- Grow the engine from a small, inspectable operator set instead of hiding everything behind framework calls.
 
-1. 启动后端并检查健康：
-   - `cd backend && uvicorn app.main:app --host 127.0.0.1 --port 9000`
-   - `curl http://127.0.0.1:9000/healthz`
-2. 启动前端：
-   - `cd frontend && npm install && npm run dev`
+## Active Area
 
-## 本地打包前端（推荐）
+- `uop/ops.py`: core UOp, operator groups, tensor specs, rewrite patterns, and backend hints.
+- `uop/algo.py`: Flux graph skeleton built from UOps.
+- `kernels/`: experimental backend kernels.
 
-在本地执行一键打包脚本：
-
-- `powershell -ExecutionPolicy Bypass -File scripts/pack-frontend.ps1`
-
-产物输出到：
-
-- `release-artifacts/s-image-frontend-<timestamp>.zip`
-- `release-artifacts/s-image-frontend-<timestamp>.zip.sha256`
-
-服务端发布命令见：
-
-- `docs/ops/frontend-artifact-release.md`
-- `docs/ops/codeup-closed-loop-runbook.md`
-
-## 关键文档
-
-- 需求：`需求文档.txt`
-- 推理策略 ADR：`docs/adr/ADR-0002-hybrid-inference-stack-2026.md`
-- 网关与网络安全：`docs/ops/gateway-security-runbook.md`
+This is work in progress. The goal is not just to run an image model, but to understand and control the graph that runs it.
