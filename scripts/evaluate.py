@@ -14,7 +14,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from algorithm.metrics import compute_fid, compute_kid, compute_lpips, compute_ssim
+from uop.metrics import compute_fid, compute_kid, compute_lpips, compute_ssim
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 PAIRWISE_METRICS = {"ssim", "lpips"}
