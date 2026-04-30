@@ -254,6 +254,21 @@ class UOp:
         hint = f", hint={self.hint.backend.value}" if self.hint else ""
         return f"UOp({self.op.name}, shape={self.spec.shape}, dtype={self.spec.dtype.value}{name}{arg}{hint})"
 
+    def argstr(self) -> str:
+        return f", arg={self.arg!r}" if self.arg is not None else ""
+
+    def tagstr(self) -> str:
+        tags: list[str] = []
+        if self.name is not None:
+            tags.append(f"name={self.name!r}")
+        if self.hint is not None:
+            hint_name = f":{self.hint.name}" if self.hint.name else ""
+            tags.append(f"hint={self.hint.backend.value}{hint_name}")
+        return f", {', '.join(tags)}" if tags else ""
+
+    def pretty(self) -> str:
+        return pretty_print(self)
+
     def replace(self, **kwargs: Any) -> UOp:
         values = {
             "op": self.op,
@@ -532,6 +547,30 @@ class GraphRewriter:
         return visit(root)
 
 
+def pretty_print(x: UOp, cache: dict[UOp, list[Any]] | None = None, d: int = 0) -> str:
+    def dfs(node: UOp, seen: dict[UOp, list[Any]]) -> None:
+        for child in node.src:
+            seen.setdefault(child, [len(seen), 0, False])[1] += 1
+            if seen[child][1] == 1:
+                dfs(child, seen)
+
+    if cache is None:
+        cache = {}
+        dfs(x, cache)
+
+    cx = cache.setdefault(x, [len(cache), 0, False])
+    if cx[2]:
+        return f"{' ' * d}x{cx[0]}"
+
+    cx[2] = True
+    srcs = "".join(f"\n{pretty_print(child, cache, d + 2)}," for child in x.src)
+    label = f"x{cx[0]}:=" if cx[1] > 1 else ""
+    return (
+        f"{' ' * d}{label}UOp({x.op.name}, shape={x.spec.shape}, "
+        f"dtype={x.spec.dtype.value}{x.argstr()}{x.tagstr()}, src=({srcs}))"
+    )
+
+
 def placeholder(name: str, shape: Shape, dtype: DType = DType.F32, layout: LayoutSpec | None = None) -> UOp:
     return UOp(
         Ops.PARAM,
@@ -683,6 +722,7 @@ __all__ = [
     "ensure_uop",
     "param",
     "placeholder",
+    "pretty_print",
     "tilelang_hint",
     "triton_hint",
     "where",
