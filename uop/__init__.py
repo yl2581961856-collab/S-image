@@ -1,5 +1,6 @@
 """UOp playground for model forward, graph rewrites, and kernel lowering."""
 from .algo import FluxConfig, FluxInputs, flux_attention, flux_block, flux_forward_graph, flux_inputs, flux_mlp
+from .lowering import DeviceTarget, LoweringPlan, LoweringStep, LoweringStatus, TargetSpec, plan_lowering
 from .ops import (
     DType,
     GraphRewriter,
@@ -26,10 +27,14 @@ from .ops import (
 
 __all__ = [
     "DType",
+    "DeviceTarget",
     "GraphRewriter",
     "GroupOp",
     "KernelBackend",
     "KernelHint",
+    "LoweringPlan",
+    "LoweringStatus",
+    "LoweringStep",
     "LayoutSpec",
     "Ops",
     "RewriteRule",
@@ -50,6 +55,8 @@ __all__ = [
     "param",
     "placeholder",
     "pretty_print",
+    "plan_lowering",
+    "TargetSpec",
     "tilelang_hint",
     "triton_hint",
     "where",

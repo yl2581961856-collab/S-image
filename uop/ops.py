@@ -191,10 +191,12 @@ class DType(str, Enum):
 
 
 class KernelBackend(str, Enum):
+    AUTO = "auto"
     PYTHON = "python"
     TORCH = "torch"
     TRITON = "triton"
     TILELANG = "tilelang"
+    CANN = "cann"
 
 
 @dataclass(frozen=True)

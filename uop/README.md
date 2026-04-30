@@ -25,10 +25,13 @@ q = q.rmsnorm(eps=1e-6)
 ## Flux graph example
 
 ```python
-from uop import FluxConfig, flux_forward_graph
+from uop import DeviceTarget, FluxConfig, TargetSpec, flux_forward_graph, plan_lowering
 
 graph = flux_forward_graph(FluxConfig(depth=2))
 print(graph.pretty())
+
+plan = plan_lowering(graph, TargetSpec(device=DeviceTarget.NVIDIA))
+print(plan.pretty())
 ```
 
 ## Intended direction
