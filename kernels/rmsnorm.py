@@ -111,10 +111,10 @@ __all__ = ["RMSNorm", "rmsnorm_torch", "rmsnorm_triton"]
 
 
 ## variance = mean(x^2)
-inv_std = rsqrt(variance + eps)
-y = x * inv_std * weight   ————> RMSNorm
+#nv_std = rsqrt(variance + eps)
+#y = x * inv_std * weight   ————> RMSNorm
 
 ## mean = mean(x)
-var = mean((x - mean)^2)
-x_hat = (x - mean) * rstd
-y = x_hat * w + b     ——————> LayerNorm
+#var = mean((x - mean)^2)
+#x_hat = (x - mean) * rstd
+#y = x_hat * w + b     ——————> LayerNorm
