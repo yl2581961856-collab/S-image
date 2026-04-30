@@ -28,7 +28,7 @@ q = q.rmsnorm(eps=1e-6)
 from uop import FluxConfig, flux_forward_graph
 
 graph = flux_forward_graph(FluxConfig(depth=2))
-print(graph)
+print(graph.pretty())
 ```
 
 ## Intended direction
@@ -36,3 +36,7 @@ print(graph)
 - Keep model code backend-neutral by composing `UOp` nodes.
 - Use `KernelHint` only at lowering boundaries, such as fused attention, RMSNorm, or tiled matmul.
 - Add rewrite rules with `UPat` + `RewriteRule` before writing backend-specific kernels.
+
+## Notes
+
+- `MATH.md`: math contracts for core UOp operators.
