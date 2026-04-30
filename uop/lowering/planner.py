@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 
+from .analysis import can_inplace, compute_dtype_for, consumer_count
 from uop.ops import DType, GroupOp, KernelBackend, Ops, Shape, UOp
 
 
@@ -38,6 +39,8 @@ class LoweringStep:
     backend: KernelBackend | None
     shape: Shape
     dtype: DType
+    compute_dtype: DType | None = None
+    can_inplace: bool = False
     name: str | None = None
     hint_name: str | None = None
 
@@ -45,9 +48,11 @@ class LoweringStep:
         backend = "-" if self.backend is None else self.backend.value
         label = f" {self.name}" if self.name else ""
         hint = f" hint={self.hint_name}" if self.hint_name else ""
+        compute = f" compute={self.compute_dtype.value}" if self.compute_dtype else ""
+        inplace = " inplace" if self.can_inplace else ""
         return (
             f"{self.index:04d} {self.status.value:<11} {backend:<8} "
-            f"{self.op.name:<18} shape={self.shape} dtype={self.dtype.value}{label}{hint}"
+            f"{self.op.name:<18} shape={self.shape} dtype={self.dtype.value}{compute}{inplace}{label}{hint}"
         )
 
 
@@ -71,6 +76,7 @@ class LoweringPlan:
 
 def plan_lowering(root: UOp, target: TargetSpec | None = None) -> LoweringPlan:
     target = target or TargetSpec()
+    consumers = consumer_count(root)
     steps = []
     for index, node in enumerate(root.toposort()):
         status = classify_op(node.op)
@@ -83,6 +89,8 @@ def plan_lowering(root: UOp, target: TargetSpec | None = None) -> LoweringPlan:
                 backend=backend,
                 shape=node.spec.shape,
                 dtype=node.spec.dtype,
+                compute_dtype=compute_dtype_for(node),
+                can_inplace=can_inplace(node, consumers),
                 name=node.name,
                 hint_name=node.hint.name if node.hint else None,
             )

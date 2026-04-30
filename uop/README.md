@@ -38,6 +38,7 @@ print(plan.pretty())
 
 - Keep model code backend-neutral by composing `UOp` nodes.
 - Use `KernelHint` only at lowering boundaries, such as fused attention, RMSNorm, or tiled matmul.
+- Keep scheduler decisions in `uop/lowering`: backend choice, compute dtype, and safe in-place candidates.
 - Add rewrite rules with `UPat` + `RewriteRule` before writing backend-specific kernels.
 
 ## Notes

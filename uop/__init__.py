@@ -1,6 +1,17 @@
 """UOp playground for model forward, graph rewrites, and kernel lowering."""
 from .algo import FluxConfig, FluxInputs, flux_attention, flux_block, flux_forward_graph, flux_inputs, flux_mlp
-from .lowering import DeviceTarget, LoweringPlan, LoweringStep, LoweringStatus, TargetSpec, plan_lowering
+from .lowering import (
+    DeviceTarget,
+    LoweringPlan,
+    LoweringStep,
+    LoweringStatus,
+    TargetSpec,
+    can_inplace,
+    compute_dtype_for,
+    consumer_count,
+    consumer_map,
+    plan_lowering,
+)
 from .ops import (
     DType,
     GraphRewriter,
@@ -45,6 +56,10 @@ __all__ = [
     "cat",
     "const",
     "custom_kernel",
+    "can_inplace",
+    "compute_dtype_for",
+    "consumer_count",
+    "consumer_map",
     "FluxConfig",
     "FluxInputs",
     "flux_attention",
