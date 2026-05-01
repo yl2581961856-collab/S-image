@@ -48,6 +48,10 @@ def rmsnorm_triton(
         raise ValueError("rmsnorm expects at least one dimension")
     if weight.ndim != 1:
         raise ValueError("rmsnorm weight must be rank-1")
+    if weight.device != x.device:
+        raise ValueError(f"weight device={weight.device} must match x device={x.device}")
+    if inplace and out is not None:
+        raise ValueError("inplace=True cannot be combined with out")
 
     hidden = x.shape[-1]
     if weight.numel() != hidden:
@@ -63,6 +67,8 @@ def rmsnorm_triton(
     elif out is not None:
         if out.shape != x.shape:
             raise ValueError(f"out shape={out.shape} must match x shape={x.shape}")
+        if out.device != x.device:
+            raise ValueError(f"out device={out.device} must match x device={x.device}")
         if out.stride(-1) != 1:
             raise ValueError("out must have contiguous last dimension")
         y = out
@@ -98,23 +104,30 @@ def rmsnorm_triton(
 
 
 class RMSNorm(torch.nn.Module):
-    def __init__(self, hidden_size: int, eps: float = 1e-6, dtype: torch.dtype | None = None) -> None:
+    def __init__(
+        self,
+        hidden_size: int,
+        eps: float = 1e-6,
+        dtype: torch.dtype | None = None,
+    ) -> None:
         super().__init__()
         self.weight = torch.nn.Parameter(torch.ones(hidden_size, dtype=dtype))
         self.eps = eps
 
-    def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
-        return rmsnorm_triton(hidden_states, self.weight, eps=self.eps)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return rmsnorm_triton(x, self.weight, eps=self.eps)
 
 
 __all__ = ["RMSNorm", "rmsnorm_torch", "rmsnorm_triton"]
 
 
-## variance = mean(x^2)
-#nv_std = rsqrt(variance + eps)
-#y = x * inv_std * weight   ————> RMSNorm
-
-## mean = mean(x)
-#var = mean((x - mean)^2)
-#x_hat = (x - mean) * rstd
-#y = x_hat * w + b     ——————> LayerNorm
+# RMSNorm:
+# variance = mean(x^2)
+# inv_std = rsqrt(variance + eps)
+# y = x * inv_std * weight
+#
+# LayerNorm:
+# mean = mean(x)
+# var = mean((x - mean)^2)
+# x_hat = (x - mean) * rstd
+# y = x_hat * w + b
