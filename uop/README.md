@@ -34,6 +34,16 @@ plan = plan_lowering(graph, TargetSpec(device=DeviceTarget.NVIDIA))
 print(plan.pretty())
 ```
 
+## Static scheduler smoke
+
+```bash
+python3 scripts/mnist.py --repeat 3 --show-plan
+```
+
+`SImageScheduler` is a small capture/replay scheduler. It fingerprints the static
+UOp graph plus target, captures a lowering plan on the first run, then replays
+the cached instruction stream for repeated runs with the same shape.
+
 ## Intended direction
 
 - Keep model code backend-neutral by composing `UOp` nodes.

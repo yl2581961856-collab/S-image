@@ -1,15 +1,23 @@
 """UOp playground for model forward, graph rewrites, and kernel lowering."""
 from .algo import FluxConfig, FluxInputs, flux_attention, flux_block, flux_forward_graph, flux_inputs, flux_mlp
 from .lowering import (
+    CapturedProgram,
     DeviceTarget,
+    ExecutableKernel,
+    ExecutionTrace,
+    KernelRun,
     LoweringPlan,
     LoweringStep,
     LoweringStatus,
+    SImageScheduler,
+    ScheduleKey,
     TargetSpec,
     can_inplace,
     compute_dtype_for,
     consumer_count,
     consumer_map,
+    graph_fingerprint,
+    make_schedule_key,
     plan_lowering,
 )
 from .ops import (
@@ -39,8 +47,13 @@ from .ops import (
 __all__ = [
     "DType",
     "DeviceTarget",
+    "CapturedProgram",
+    "ExecutableKernel",
+    "ExecutionTrace",
     "GraphRewriter",
     "GroupOp",
+    "graph_fingerprint",
+    "KernelRun",
     "KernelBackend",
     "KernelHint",
     "LoweringPlan",
@@ -71,6 +84,9 @@ __all__ = [
     "placeholder",
     "pretty_print",
     "plan_lowering",
+    "make_schedule_key",
+    "SImageScheduler",
+    "ScheduleKey",
     "TargetSpec",
     "tilelang_hint",
     "triton_hint",
